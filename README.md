@@ -3,7 +3,7 @@
 
 **Saturn_Static** is an improved version of [Saturn](https://github.com/HeronSky/Saturn), offering easier deployment with static web pages. It now supports **dark mode** and automatically adjusts chart times based on your local timezone.  
 
-[Access Saturn_Static Web App](https://saturnstaticwebapp.netlify.app)  
+[Access Saturn_Static Web App](https://heronsky.github.io/Saturn_Static/)  
 
 ---
 
@@ -41,7 +41,7 @@ Click **"Download Plot"** to save the chart as a PNG image for offline use.
 
 **Saturn_Static** 是 [Saturn](https://github.com/HeronSky/Saturn) 的改進版本，提供更方便的靜態網頁部署。它新增了 **深色模式**，並根據用戶的時區自動調整圖表時間標籤。  
 
-[訪問 Saturn_Static 網頁應用](https://saturnstaticwebapp.netlify.app)  
+[訪問 Saturn_Static 網頁應用](https://heronsky.github.io/Saturn_Static/)  
 
 ---
 
