@@ -16,6 +16,7 @@
             text-align: center;
             background-color: white;
             color: black;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
         .form-group {
             margin-bottom: 20px;
@@ -43,37 +44,54 @@
             max-width: 100%;
             margin-top: 15px;
         }
-        #location-btn {
-            margin-left: 10px;
-            padding: 5px 10px;
-            border: 1px solid #007bff;
-            background-color: white;
-            color: #007bff;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-        #location-btn:hover {
-            background-color: #007bff;
-            color: white;
-        }
-        .language-toggle {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .language-toggle button {
-            margin: 0 5px;
+        button, #generate-btn, #download-btn, #location-btn, .language-toggle button {
             padding: 8px 16px;
-            border: 1px solid #007bff;
-            background-color: white;
+            font-size: 14px;
+            background-color: transparent;
             color: #007bff;
-            cursor: pointer;
+            border: 2px solid #007bff;
             border-radius: 4px;
-            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background-color 0.3s, color 0.3s;
         }
-        .language-toggle button:hover {
+        button:hover, #generate-btn:hover, #download-btn:hover, #location-btn:hover, .language-toggle button:hover {
             background-color: #007bff;
-            color: white;
+            color: #ffffff;
+        }
+        #toggle-dark-mode {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: transparent;
+            color: black;
+            border: 2px solid #000000;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background-color 0.3s, color 0.3s;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+        #toggle-dark-mode:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .dark-mode #toggle-dark-mode {
+            color: #ffffff;
+            border: 2px solid #ffffff;
+        }
+        .dark-mode #toggle-dark-mode:hover {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .dark-mode button, .dark-mode #generate-btn, .dark-mode #download-btn, .dark-mode #location-btn, .dark-mode .language-toggle button {
+            color: #4ea8de;
+            border: 2px solid #4ea8de;
+        }
+        .dark-mode button:hover, .dark-mode #generate-btn:hover, .dark-mode #download-btn:hover, .dark-mode #location-btn:hover, .dark-mode .language-toggle button:hover {
+            background-color: #4ea8de;
+            color: #121212;
         }
         .github-link {
             margin-bottom: 20px;
@@ -87,79 +105,31 @@
         .github-link a:hover {
             text-decoration: underline;
         }
-        #generate-btn {
-            padding: 10px 20px;
-            border: none;
-            background-color: #28a745;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        #generate-btn:hover {
-            background-color: #218838;
-        }
-        #download-btn {
-            display: none;
-            margin-top: 15px;
-            padding: 8px 16px;
-            border: none;
-            background-color: #17a2b8;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        #download-btn:hover {
-            background-color: #138496;
-        }
         .dark-mode {
-            background-color: #2e2e2e;
-            color: #dcdcdc;
+            background-color: #1e1e1e;
+            color: #ffffff;
         }
-        .dark-mode #location-btn,
-        .dark-mode .language-toggle button,
-        .dark-mode .github-link a,
-        .dark-mode #generate-btn,
-        .dark-mode #download-btn {
-            border-color: #007bff;
-            background-color: #2e2e2e;
-            color: #007bff;
+        .dark-mode a,
+        .dark-mode a:hover,
+        .dark-mode a:visited {
+            color: #4ea8de;
         }
-        .dark-mode #location-btn:hover,
-        .dark-mode .language-toggle button:hover,
-        .dark-mode .github-link a:hover,
-        .dark-mode #generate-btn:hover,
-        .dark-mode #download-btn:hover {
-            background-color: #007bff;
-            color: white;
+        .dark-mode .form-group label,
+        .dark-mode h1,
+        .dark-mode label {
+            color: #ffffff;
+        }
+        .dark-mode input,
+        .dark-mode select {
+            background-color: #333333;
+            color: #ffffff;
+            border: 1px solid #555555;
+        }
+        .dark-mode input::placeholder {
+            color: #aaaaaa;
         }
         .dark-mode #error {
             color: #ff6b6b;
-        }
-        #toggle-dark-mode {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 10px 20px;
-            border: 1px solid #007bff;
-            background-color: white;
-            color: #007bff;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        #toggle-dark-mode:hover {
-            background-color: #007bff;
-            color: white;
-        }
-        .dark-mode #toggle-dark-mode {
-            background-color: #2e2e2e;
-            color: #007bff;
-        }
-        .dark-mode #toggle-dark-mode:hover {
-            background-color: #007bff;
-            color: white;
         }
     </style>
     <meta property="og:title" content="Saturn 行星高度變化圖表">
@@ -173,6 +143,8 @@
         <button onclick="changeLanguage('zh')">中文</button>
         <button onclick="changeLanguage('en')">English</button>
     </div>
+
+    <button id="toggle-dark-mode" onclick="toggleDarkMode()" data-zh="深色模式" data-en="Dark Mode">深色模式</button>
 
     <div class="github-link">
         <a href="https://github.com/HeronSky/Saturn_Static" target="_blank" data-zh="GitHub 專案" data-en="GitHub Project">GitHub 專案</a>
@@ -220,8 +192,6 @@
         <div id="result"></div>
         <button id="download-btn" onclick="downloadImage()" style="display: none;" data-zh="下載圖片" data-en="Download Image">下載圖片</button>
     </div>
-
-    <button id="toggle-dark-mode" onclick="toggleDarkMode()" data-zh="深色模式" data-en="Dark Mode">深色模式</button>
 
     <script>
         let currentLanguage = 'zh';
@@ -305,11 +275,6 @@
                 return;
             }
 
-            console.log('Selected bodies:', selectedBodies);
-            console.log('Hours:', hours);
-            console.log('Latitude:', latitude);
-            console.log('Longitude:', longitude);
-
             generateAltitudePlot(selectedBodies, parseFloat(latitude), parseFloat(longitude), parseInt(hours))
                 .then(data => {
                     loadingEl.style.display = 'none';
@@ -336,16 +301,10 @@
 
         async function generateAltitudePlot(selectedBodies, latitude, longitude, hours) {
             try {
-                console.log('Generating altitude plot with the following parameters:');
-                console.log('Selected bodies:', selectedBodies);
-                console.log('Latitude:', latitude);
-                console.log('Longitude:', longitude);
-                console.log('Hours:', hours);
-
                 const times = [];
                 const now = new Date();
-                for (let i = 0; i <= hours; i++) {
-                    const time = new Date(now.getTime() + i * 60 * 60 * 1000);
+                for (let i = 0; i <= hours * 4; i++) {
+                    const time = new Date(now.getTime() + i * 15 * 60 * 1000);
                     times.push(time);
                 }
 
@@ -363,7 +322,8 @@
                         x: times,
                         y: altitudes,
                         mode: 'lines',
-                        name: body
+                        name: body,
+                        line: { shape: 'spline' }
                     });
                 }
 
@@ -371,11 +331,16 @@
                     title: currentLanguage === 'zh' ? '天體高度變化圖表' : 'Planet Altitude Chart',
                     xaxis: { title: currentLanguage === 'zh' ? '時間' : 'Time', titlefont: { size: 18 } },
                     yaxis: { title: currentLanguage === 'zh' ? '高度 (度)' : 'Altitude (degrees)', titlefont: { size: 18 } },
-                    font: { size: 16 }
+                    font: { size: 16 },
+                    paper_bgcolor: document.body.classList.contains('dark-mode') ? '#1e1e1e' : 'white',
+                    plot_bgcolor: document.body.classList.contains('dark-mode') ? '#1e1e1e' : 'white',
+                    font: {
+                        color: document.body.classList.contains('dark-mode') ? '#ffffff' : 'black'
+                    }
                 };
 
                 const plotDiv = document.createElement('div');
-                Plotly.newPlot(plotDiv, traces, layout);
+                await Plotly.newPlot(plotDiv, traces, layout);
 
                 const imageURL = await Plotly.toImage(plotDiv, { format: 'png', width: 1600, height: 900 });
                 return { image: imageURL };
