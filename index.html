@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saturn 行星高度變化圖表</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min"></script>
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
     <style>
@@ -17,10 +16,54 @@
             background-color: white;
             color: black;
             transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative;
         }
         .form-group {
             margin-bottom: 20px;
             text-align: center;
+        }
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: transparent;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #007bff;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background-color 0.3s, color 0.3s;
+            background-image: none;
+            box-shadow: none;
+        }
+        button, #generate-btn, #download-btn, #location-btn, .language-toggle button, input {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: transparent;
+            color: #007bff;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        button:hover, #generate-btn:hover, #download-btn:hover, #location-btn:hover, .language-toggle button:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        #loading, #error {
+            display: none;
+            margin-top: 15px;
+        }
+        #error {
+            color: red;
+        }
+        #result img {
+            max-width: 100%;
+            margin-top: 15px;
+            image-rendering: auto;
         }
         .checkbox-group {
             display: grid;
@@ -33,39 +76,13 @@
             align-items: center;
             justify-content: center;
         }
-        #loading, #error {
-            display: none;
-            margin-top: 15px;
-        }
-        #error {
-            color: red;
-        }
-        #result img {
-            max-width: 100%;
-            margin-top: 15px;
-        }
-        button, #generate-btn, #download-btn, #location-btn, .language-toggle button {
-            padding: 8px 16px;
-            font-size: 14px;
-            background-color: transparent;
-            color: #007bff;
-            border: 2px solid #007bff;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 10px 5px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        button:hover, #generate-btn:hover, #download-btn:hover, #location-btn:hover, .language-toggle button:hover {
-            background-color: #007bff;
-            color: #ffffff;
-        }
         #toggle-dark-mode {
             padding: 8px 16px;
             font-size: 14px;
             background-color: transparent;
             color: black;
             border: 2px solid #000000;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             margin: 10px 5px;
             transition: background-color 0.3s, color 0.3s;
@@ -131,6 +148,99 @@
         .dark-mode #error {
             color: #ff6b6b;
         }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination button {
+            padding: 6px 12px;
+            font-size: 14px;
+            border: 1px solid #007bff;
+            background-color: transparent;
+            color: #007bff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .pagination button.active,
+        .pagination button:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        .dark-mode .pagination button {
+            border: 1px solid #4ea8de;
+            color: #4ea8de;
+        }
+        .dark-mode .pagination button.active,
+        .dark-mode .pagination button:hover {
+            background-color: #4ea8de;
+            color: #121212;
+        }
+        .selected-bodies-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .selected-bodies-title {
+            font-size: 14px;
+            font-weight: normal;
+            margin-bottom: 5px;
+            color: inherit;
+        }
+        .selected-bodies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            background-color: transparent;
+            padding: 5px;
+            border-radius: 4px;
+            justify-content: center;
+        }
+        .body-item {
+            background-color: #dddddd;
+            color: #000000;
+            padding: 3px 6px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .body-item:hover {
+            background-color: #c0c0c0;
+        }
+        .dark-mode .selected-bodies {
+            background-color: transparent;
+        }
+        .dark-mode .body-item {
+            background-color: #555555;
+            color: #ffffff;
+        }
+        .dark-mode .body-item:hover {
+            background-color: #777777;
+        }
+        .checkboxes-title {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .category-title {
+            text-align: center;
+            grid-column: 1 / -1;
+            font-size: 1.2em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: inherit;
+        }
+        .flex-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
     </style>
     <meta property="og:title" content="Saturn 行星高度變化圖表">
     <meta property="og:description" content="生成並顯示行星高度變化圖表">
@@ -147,30 +257,34 @@
     <button id="toggle-dark-mode" onclick="toggleDarkMode()" data-zh="深色模式" data-en="Dark Mode">深色模式</button>
 
     <div class="github-link">
-        <a href="https://github.com/HeronSky/Saturn_Static" target="_blank" data-zh="GitHub 專案" data-en="GitHub Project">GitHub 專案</a>
+        <a href="https://github.com/HeronSky/Saturn" target="_blank" data-zh="GitHub 專案" data-en="GitHub Project">GitHub 專案</a>
     </div>
 
     <div class="container">
         <h1 data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">Saturn 行星高度變化圖表</h1>
 
         <div class="form-group">
-            <label data-zh="選擇天體:" data-en="Select Planets:">選擇天體:</label>
-            <div class="checkbox-group">
-                <label><input type="checkbox" name="body" value="Mercury" data-zh="水星" data-en="Mercury"> <span data-zh="水星" data-en="Mercury">水星</span></label>
-                <label><input type="checkbox" name="body" value="Venus" data-zh="金星" data-en="Venus"> <span data-zh="金星" data-en="Venus">金星</span></label>
-                <label><input type="checkbox" name="body" value="Mars" data-zh="火星" data-en="Mars"> <span data-zh="火星" data-en="Mars">火星</span></label>
-                <label><input type="checkbox" name="body" value="Jupiter" data-zh="木星" data-en="Jupiter"> <span data-zh="木星" data-en="Jupiter">木星</span></label>
-                <label><input type="checkbox" name="body" value="Saturn" data-zh="土星" data-en="Saturn"> <span data-zh="土星" data-en="Saturn">土星</span></label>
-                <label><input type="checkbox" name="body" value="Uranus" data-zh="天王星" data-en="Uranus"> <span data-zh="天王星" data-en="Uranus">天王星</span></label>
-                <label><input type="checkbox" name="body" value="Neptune" data-zh="海王星" data-en="Neptune"> <span data-zh="海王星" data-en="Neptune">海王星</span></label>
-                <label><input type="checkbox" name="body" value="Moon" data-zh="月球" data-en="Moon"> <span data-zh="月球" data-en="Moon">月球</span></label>
-                <label><input type="checkbox" name="body" value="Sun" data-zh="太陽" data-en="Sun"> <span data-zh="太陽" data-en="Sun">太陽</span></label>
+            <h2 class="checkboxes-title" data-zh="選擇天體" data-en="Select Celestial Bodies">選擇天體</h2>
+            <div class="checkbox-group" id="checkbox-group">
+            </div>
+            <div class="pagination" id="pagination">
+            </div>
+        </div>
+
+        <div class="form-group selected-bodies-container">
+            <div class="selected-bodies-title" data-zh="已選擇的天體" data-en="Selected Bodies">已選擇的天體</div>
+            <div class="selected-bodies" id="selected-bodies">
             </div>
         </div>
 
         <div class="form-group">
             <label for="hours" data-zh="時間範圍（小時）:" data-en="Time Range (Hours):">時間範圍（小時）:</label>
             <input type="number" id="hours" name="hours" min="1" max="24" value="8">
+        </div>
+
+        <div class="form-group">
+            <label for="start-time" data-zh="開始時間:" data-en="Start Time:">開始時間:</label>
+            <input type="datetime-local" id="start-time" name="start-time" required>
         </div>
 
         <div class="form-group">
@@ -183,7 +297,21 @@
             <button id="location-btn" onclick="getCurrentLocation()" data-zh="自動獲取位置" data-en="Get Current Location">自動獲取位置</button>
         </div>
 
-        <div class="form-group">
+        <div class="form-group flex-row">
+            <label for="image-format" data-zh="圖片格式：" data-en="Image Format:">圖片格式：</label>
+            <select id="image-format" name="image-format">
+                <option value="png">PNG</option>
+                <option value="jpeg">JPEG</option>
+                <option value="svg">SVG</option>
+            </select>
+
+            <label for="image-quality" data-zh="圖片品質：" data-en="Image Quality:">圖片品質：</label>
+            <select id="image-quality" name="image-quality">
+                <option value="low" data-zh="低" data-en="Low">低</option>
+                <option value="medium" data-zh="中" data-en="Medium" selected>中</option>
+                <option value="high" data-zh="高" data-en="High">高</option>
+            </select>
+
             <button id="generate-btn" onclick="generateChart()" data-zh="生成圖表" data-en="Generate Chart">生成圖表</button>
         </div>
 
@@ -195,6 +323,11 @@
 
     <script>
         let currentLanguage = 'zh';
+        let selectedBodiesSet = new Set();
+        let currentPage = 1;
+        const itemsPerPage = 9;
+        let totalPages = 1;
+        let allBodies = [];
 
         function changeLanguage(lang) {
             currentLanguage = lang;
@@ -202,12 +335,387 @@
                 el.textContent = el.getAttribute(`data-${lang}`);
             });
             updateDarkModeButtonText();
+            renderCheckboxes();
+            renderPagination();
+            updateSelectedBodiesList();
+            document.getElementById('image-format').previousElementSibling.textContent = lang === 'zh' ? '圖片格式：' : 'Image Format:';
+            document.getElementById('image-quality').previousElementSibling.textContent = lang === 'zh' ? '圖片品質：' : 'Image Quality:';
+            document.querySelectorAll('#image-quality option').forEach(option => {
+                option.textContent = option.getAttribute(`data-${lang}`);
+            });
+        }
+
+        async function loadBodies() {
+            try {
+                const response = await fetch('bodies.txt');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const text = await response.text();
+                const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('//'));
+
+                let currentCategory = '';
+                allBodies = [];
+                lines.forEach(line => {
+                    if (line.startsWith('Category:')) {
+                        currentCategory = line.replace('Category:', '').trim();
+                    } else {
+                        const parts = line.split(',').map(part => part.trim());
+                        const value = parts[0];
+                        const zh = parts[1];
+                        const en = parts[2];
+                        const extra = parts.slice(3).join(',');
+                        allBodies.push({ value, zh, en, category: currentCategory, extra });
+                    }
+                });
+
+                totalPages = Math.ceil(allBodies.length / itemsPerPage);
+                currentPage = 1;
+                renderCheckboxes();
+                renderPagination();
+            } catch (error) {
+                console.error('Error loading bodies.txt:', error);
+                showError(currentLanguage === 'zh' ? '無法載入天體資料' : 'Unable to load celestial bodies data');
+            }
+        }
+
+        function renderCheckboxes() {
+            const checkboxGroup = document.getElementById('checkbox-group');
+            checkboxGroup.innerHTML = '';
+
+            if (currentPage !== 1) {
+                const message = document.createElement('div');
+                message.style.color = 'red';
+                message.style.fontWeight = 'bold';
+                message.style.marginTop = '10px';
+                message.style.textAlign = 'center';
+                message.style.whiteSpace = 'nowrap';
+                message.textContent = currentLanguage === 'zh' 
+                    ? '由於會生成錯誤的圖表，暫時無法選取太陽系外天體' 
+                    : 'Due to generating incorrect charts, selecting exoplanets is temporarily unavailable';
+                checkboxGroup.appendChild(message);
+            }
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const currentBodies = allBodies.slice(start, end);
+
+            let lastCategory = '';
+
+            currentBodies.forEach(body => {
+                if (body.category !== lastCategory) {
+                    const categoryTitle = document.createElement('div');
+                    categoryTitle.className = 'category-title';
+                    categoryTitle.textContent = currentLanguage === 'zh' ? body.category : translateCategory(body.category);
+                    checkboxGroup.appendChild(categoryTitle);
+                    lastCategory = body.category;
+                }
+
+                const label = document.createElement('label');
+                label.style.display = 'flex';
+                label.style.alignItems = 'center';
+                label.style.justifyContent = 'center';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'body';
+                checkbox.value = body.value;
+                checkbox.setAttribute('data-zh', body.zh);
+                checkbox.setAttribute('data-en', body.en);
+                if (selectedBodiesSet.has(body.value)) {
+                    checkbox.checked = true;
+                }
+
+                if (currentPage !== 1) {
+                    checkbox.disabled = true;
+                }
+
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        selectedBodiesSet.add(body.value);
+                    } else {
+                        selectedBodiesSet.delete(body.value);
+                    }
+                    updateSelectedBodiesList();
+                });
+
+                const span = document.createElement('span');
+                span.textContent = currentLanguage === 'zh' ? body.zh : body.en;
+                span.setAttribute('data-zh', body.zh);
+                span.setAttribute('data-en', body.en);
+
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                checkboxGroup.appendChild(label);
+            });
+        }
+
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            const prevButton = document.createElement('button');
+            prevButton.textContent = currentLanguage === 'zh' ? '上一頁' : 'Previous';
+            prevButton.disabled = currentPage === 1;
+            prevButton.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderCheckboxes();
+                    renderPagination();
+                }
+            };
+            pagination.appendChild(prevButton);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                if (i === currentPage) {
+                    pageButton.classList.add('active');
+                }
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    renderCheckboxes();
+                    renderPagination();
+                };
+                pagination.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.onclick = () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderCheckboxes();
+                    renderPagination();
+                }
+            };
+            pagination.appendChild(nextButton);
+        }
+
+        function translateCategory(category) {
+            const translations = {
+                '行星': 'Planets',
+                '星系': 'Galaxies',
+                '星雲': 'Nebulas'
+            };
+            return translations[category] || category;
         }
 
         function showError(message) {
             const errorEl = document.getElementById('error');
             errorEl.textContent = message;
             errorEl.style.display = 'block';
+        }
+
+        function hideError() {
+            const errorEl = document.getElementById('error');
+            errorEl.style.display = 'none';
+        }
+
+        function updateSelectedBodiesList() {
+            const container = document.getElementById('selected-bodies');
+            container.innerHTML = '';
+            selectedBodiesSet.forEach(body => {
+                const div = document.createElement('div');
+                div.className = 'body-item';
+                div.textContent = getPlanetName(body);
+                div.onclick = () => {
+                    selectedBodiesSet.delete(body);
+                    updateSelectedBodiesList();
+                    const checkbox = document.querySelector(`input[value="${body}"]`);
+                    if (checkbox) checkbox.checked = false;
+                };
+                container.appendChild(div);
+            });
+        }
+
+        function getPlanetName(bodyValue) {
+            const body = allBodies.find(b => b.value === bodyValue);
+            if (!body) return bodyValue;
+            return currentLanguage === 'zh' ? body.zh : body.en;
+        }
+
+        async function generateChart() {
+            const errorEl = document.getElementById('error');
+            const resultEl = document.getElementById('result');
+            const loadingEl = document.getElementById('loading');
+            const downloadBtn = document.getElementById('download-btn');
+            errorEl.style.display = 'none';
+            resultEl.innerHTML = '';
+            loadingEl.style.display = 'block';
+            downloadBtn.style.display = 'none';
+
+            const selectedBodies = Array.from(selectedBodiesSet);
+            const hours = parseFloat(document.getElementById('hours').value);
+            const startTime = document.getElementById('start-time').value;
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const imageFormat = document.getElementById('image-format').value;
+            const imageQualitySelection = document.getElementById('image-quality').value;
+
+            if (selectedBodies.length === 0) {
+                loadingEl.style.display = 'none';
+                showError(currentLanguage === 'zh' ? '請至少選擇一個天體' : 'Please select at least one celestial body');
+                return;
+            }
+
+            if (isNaN(latitude) || isNaN(longitude)) {
+                loadingEl.style.display = 'none';
+                showError(currentLanguage === 'zh' ? '請輸入有效的緯度和經度' : 'Please enter valid latitude and longitude');
+                return;
+            }
+
+            try {
+                const astro = Astronomy;
+                const observer = new astro.Observer(latitude, longitude, 0);
+
+                const startDate = new Date(startTime);
+                if (isNaN(startDate)) {
+                    loadingEl.style.display = 'none';
+                    showError(currentLanguage === 'zh' ? '請輸入有效的開始時間' : 'Please enter a valid start time');
+                    return;
+                }
+
+                const deltaHours = hours;
+                const timeArray = [];
+                for (let i = 0; i <= deltaHours * 4; i++) {
+                    let dt = new Date(startDate.getTime() + (i * 15 * 60000));
+                    timeArray.push(dt);
+                }
+
+                const traces = [];
+
+                for (let bodyName of selectedBodies) {
+                    const altitudes = [];
+                    const times = [];
+                    for (let dt of timeArray) {
+                        let jd = astro.MakeTime(dt);
+                        let horizontal;
+                        if (astro.Body[bodyName]) {
+                            const equCoords = astro.Equator(bodyName, jd, observer, true, true);
+                            horizontal = astro.Horizon(jd, observer, equCoords.ra, equCoords.dec, 'normal');
+                        } else {
+                            const bodyData = allBodies.find(b => b.value === bodyName);
+                            if (!bodyData) {
+                                showError(currentLanguage === 'zh' ? `無法找到天體：${bodyName}` : `Unable to find celestial body: ${bodyName}`);
+                                return;
+                            }
+                            const raDec = parseRaDec(bodyData.extra);
+                            if (!raDec) {
+                                showError(currentLanguage === 'zh' ? `RA/Dec 格式錯誤：${bodyData.extra}` : `Invalid RA/Dec format: ${bodyData.extra}`);
+                                return;
+                            }
+                            const ra = raDec.ra;
+                            const dec = raDec.dec;
+                            horizontal = astro.Horizon(jd, observer, ra, dec, 'normal');
+                        }
+                        console.log(`Body: ${bodyName}, Time: ${dt.toISOString()}, Altitude: ${horizontal.altitude}`);
+                        altitudes.push(horizontal.altitude);
+                        times.push(dt);
+                    }
+
+                    traces.push({
+                        x: times,
+                        y: altitudes,
+                        mode: 'lines',
+                        name: getPlanetName(bodyName)
+                    });
+                }
+
+                const layout = {
+                    showlegend: true,
+                    xaxis: {
+                        title: currentLanguage === 'zh' ? '當地時間' : 'Local Time',
+                        tickformat: '%H:%M',
+                        nticks: deltaHours + 1
+                    },
+                    yaxis: {
+                        title: currentLanguage === 'zh' ? '高度 (度)' : 'Altitude (degrees)'
+                    }
+                };
+
+                Plotly.newPlot(resultEl, traces, layout).then(function(gd) {
+                    let imageQuality;
+                    switch(imageQualitySelection) {
+                        case 'low':
+                            imageQuality = 0.5;
+                            break;
+                        case 'medium':
+                            imageQuality = 0.75;
+                            break;
+                        case 'high':
+                            imageQuality = 1;
+                            break;
+                        default:
+                            imageQuality = 1;
+                    }
+
+                    let toImageOptions = {
+                        format: imageFormat,
+                        width: 1280,
+                        height: 720,
+                        scale: imageQuality
+                    };
+
+                    Plotly.toImage(gd, toImageOptions).then(function(dataUrl) {
+                        Plotly.purge(resultEl);
+                        const img = new Image();
+                        img.src = dataUrl;
+                        img.alt = currentLanguage === 'zh' ? '天體高度變化圖表' : 'Celestial Bodies Altitude Chart';
+                        img.style.maxWidth = '100%';
+                        resultEl.appendChild(img);
+
+                        loadingEl.style.display = 'none';
+                        downloadBtn.style.display = 'block';
+                        downloadBtn.onclick = function() {
+                            const link = document.createElement('a');
+                            link.href = dataUrl;
+                            link.download = 'chart.' + imageFormat;
+                            link.click();
+                        };
+                    }).catch(function(error) {
+                        console.error('Error generating image:', error);
+                        loadingEl.style.display = 'none';
+                        showError(currentLanguage === 'zh' ? '生成圖像時出錯' : 'Error generating image');
+                    });
+                }).catch(function(error) {
+                    console.error('Error generating chart:', error);
+                    loadingEl.style.display = 'none';
+                    showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
+                });
+            } catch (error) {
+                console.error('Error generating chart:', error);
+                loadingEl.style.display = 'none';
+                showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
+            }
+        }
+
+        function parseRaDec(raDecString) {
+            const [raStr, decStr] = raDecString.split(',');
+            const ra = parseRa(raStr);
+            const dec = parseDec(decStr);
+            return { ra, dec };
+        }
+
+        function parseRa(raStr) {
+            const matches = raStr.match(/(\d+)h\s*(\d+)m\s*(\d+(\.\d+)?)s/);
+            if (!matches) return 0;
+            const hours = parseFloat(matches[1]);
+            const minutes = parseFloat(matches[2]);
+            const seconds = parseFloat(matches[3]);
+            return (hours + minutes / 60 + seconds / 3600) * 15;
+        }
+
+        function parseDec(decStr) {
+            const matches = decStr.match(/([+-]?\d+)°\s*(\d+)'?\s*(\d+(\.\d+)?)"?/);
+            if (!matches) return 0;
+            const degrees = parseFloat(matches[1]);
+            const minutes = parseFloat(matches[2]);
+            const seconds = parseFloat(matches[3]);
+            return degrees + minutes / 60 + seconds / 3600;
         }
 
         function getCurrentLocation() {
@@ -238,121 +746,19 @@
                         default:
                             errorMessage += currentLanguage === 'zh' ? '未知錯誤' : 'Unknown error';
                     }
-                    
+
                     errorEl.textContent = errorMessage;
                     errorEl.style.display = 'block';
                 }
             );
         }
 
-        function generateChart() {
-            const errorEl = document.getElementById('error');
-            const resultEl = document.getElementById('result');
-            const loadingEl = document.getElementById('loading');
-            const downloadBtn = document.getElementById('download-btn');
-            errorEl.style.display = 'none';
-            resultEl.innerHTML = '';
-            loadingEl.style.display = 'block';
-            downloadBtn.style.display = 'none';
-
-            const selectedBodies = Array.from(
-                document.querySelectorAll('input[name="body"]:checked')
-            ).map(el => el.value);
-
-            const hours = document.getElementById('hours').value;
-            const latitude = document.getElementById('latitude').value;
-            const longitude = document.getElementById('longitude').value;
-
-            if (selectedBodies.length === 0) {
-                loadingEl.style.display = 'none';
-                showError(currentLanguage === 'zh' ? '請至少選擇一個天體' : 'Please select at least one planet');
-                return;
-            }
-
-            if (!latitude || !longitude) {
-                loadingEl.style.display = 'none';
-                showError(currentLanguage === 'zh' ? '請輸入緯度和經度' : 'Please enter latitude and longitude');
-                return;
-            }
-
-            generateAltitudePlot(selectedBodies, parseFloat(latitude), parseFloat(longitude), parseInt(hours))
-                .then(data => {
-                    loadingEl.style.display = 'none';
-                    const img = document.createElement('img');
-                    img.src = data.image;
-                    img.alt = currentLanguage === 'zh' ? '天體高度變化圖表' : 'Planet Altitude Chart';
-                    resultEl.innerHTML = '';
-                    resultEl.appendChild(img);
-
-                    downloadBtn.style.display = 'block';
-                    downloadBtn.onclick = function() {
-                        const link = document.createElement('a');
-                        link.href = img.src;
-                        link.download = 'chart.png';
-                        link.click();
-                    };
-                })
-                .catch(error => {
-                    loadingEl.style.display = 'none';
-                    console.error('Error generating chart:', error);
-                    showError(error.message || (currentLanguage === 'zh' ? '發生未知錯誤' : 'An unknown error occurred'));
-                });
-        }
-
-        async function generateAltitudePlot(selectedBodies, latitude, longitude, hours) {
-            try {
-                const times = [];
-                const now = new Date();
-                for (let i = 0; i <= hours * 4; i++) {
-                    const time = new Date(now.getTime() + i * 15 * 60 * 1000);
-                    times.push(time);
-                }
-
-                const traces = [];
-                for (const body of selectedBodies) {
-                    const altitudes = [];
-                    for (const time of times) {
-                        const observer = new Astronomy.Observer(latitude, longitude, 0);
-                        const astroTime = Astronomy.MakeTime(time);
-                        const bodyPosition = Astronomy.Equator(body, astroTime, observer, true, true);
-                        const horizontal = Astronomy.Horizon(astroTime, observer, bodyPosition.ra, bodyPosition.dec, 'normal');
-                        altitudes.push(horizontal.altitude);
-                    }
-                    traces.push({
-                        x: times,
-                        y: altitudes,
-                        mode: 'lines',
-                        name: body,
-                        line: { shape: 'spline' }
-                    });
-                }
-
-                const layout = {
-                    title: currentLanguage === 'zh' ? '天體高度變化圖表' : 'Planet Altitude Chart',
-                    xaxis: { title: currentLanguage === 'zh' ? '時間' : 'Time', titlefont: { size: 18 } },
-                    yaxis: { title: currentLanguage === 'zh' ? '高度 (度)' : 'Altitude (degrees)', titlefont: { size: 18 } },
-                    font: { size: 16 },
-                    paper_bgcolor: document.body.classList.contains('dark-mode') ? '#1e1e1e' : 'white',
-                    plot_bgcolor: document.body.classList.contains('dark-mode') ? '#1e1e1e' : 'white',
-                    font: {
-                        color: document.body.classList.contains('dark-mode') ? '#ffffff' : 'black'
-                    }
-                };
-
-                const plotDiv = document.createElement('div');
-                await Plotly.newPlot(plotDiv, traces, layout);
-
-                const imageURL = await Plotly.toImage(plotDiv, { format: 'png', width: 1600, height: 900 });
-                return { image: imageURL };
-            } catch (error) {
-                console.error('Error generating altitude plot:', error);
-                throw error;
-            }
-        }
-
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             updateDarkModeButtonText();
+            renderCheckboxes();
+            renderPagination();
+            updateSelectedBodiesList();
         }
 
         function updateDarkModeButtonText() {
@@ -362,12 +768,33 @@
                 (currentLanguage === 'zh' ? '深色模式' : 'Dark Mode');
         }
 
-        window.onload = function() {
+        function downloadImage() {
+            const img = document.querySelector('#result img');
+            if (img) {
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = 'chart.' + img.src.split('.').pop().split('?')[0];
+                link.click();
+            }
+        }
+
+        window.onload = async function() {
             const locationBtn = document.getElementById('location-btn');
             if (!navigator.geolocation) {
                 locationBtn.style.display = 'none';
             }
+            await loadBodies();
             updateDarkModeButtonText();
+
+            const startTimeInput = document.getElementById('start-time');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            startTimeInput.value = localDateTime;
         };
     </script>
 </body>
