@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW"></html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +15,7 @@
             text-align: center;
             background-color: white;
             color: black;
-            transition: background-color 0.5s ease, color 0.5s ease;
+            transition: background-color 1s ease, color 1s ease;
             position: relative;
         }
         .form-group {
@@ -34,7 +34,7 @@
             color: #007bff;
             cursor: pointer;
             margin: 10px 5px;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 1s ease, color 1s ease;
             background-image: none;
             box-shadow: none;
         }
@@ -47,7 +47,7 @@
             border-radius: 8px;
             cursor: pointer;
             margin: 10px 5px;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 1s ease, color 1s ease;
         }
         button:hover, #generate-btn:hover, #download-btn:hover, #location-btn:hover, .language-toggle button:hover {
             background-color: #007bff;
@@ -76,6 +76,13 @@
             align-items: center;
             justify-content: center;
         }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+            align-items: center;
+        }
         #toggle-dark-mode {
             padding: 8px 16px;
             font-size: 14px;
@@ -85,7 +92,7 @@
             border-radius: 8px;
             cursor: pointer;
             margin: 10px 5px;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 1s ease, color 1s ease;
             position: fixed;
             top: 10px;
             right: 10px;
@@ -162,7 +169,7 @@
             color: #007bff;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 1s ease, color 1s ease;
         }
         .pagination button.active,
         .pagination button:hover {
@@ -206,7 +213,7 @@
             align-items: center;
             font-size: 12px;
             cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 1s ease, color 1s ease;
         }
         .body-item:hover {
             background-color: #c0c0c0;
@@ -241,6 +248,95 @@
             gap: 15px;
             flex-wrap: wrap;
         }
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            width: 70%;
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        .dark-mode .modal-content {
+            background-color: #2e2e2e;
+            color: #ffffff;
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaaaaa;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #000000;
+        }
+        .dark-mode .close-btn:hover,
+        .dark-mode .close-btn:focus {
+            color: #ffffff;
+        }
+        .modal-content ol {
+            padding-left: 20px;
+            text-align: left;
+        }
+        .modal-content li {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: inherit;
+        }
+        #add-body-form label {
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+        }
+        #add-body-form input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        #add-body-form button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #add-body-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .language-toggle button.active {
+            background-color: #007bff;
+            color: #ffffff;
+            cursor: default;
+            pointer-events: none;
+        }
     </style>
     <meta property="og:title" content="Saturn 行星高度變化圖表">
     <meta property="og:description" content="生成並顯示行星高度變化圖表">
@@ -250,18 +346,48 @@
 </head>
 <body>
     <div class="language-toggle">
-        <button onclick="changeLanguage('zh')">中文</button>
-        <button onclick="changeLanguage('en')">English</button>
+        <button onclick="changeLanguage('zh')" data-zh="中文" data-en="Chinese">中文</button>
+        <button onclick="changeLanguage('en')" data-zh="英文" data-en="English">English</button>
     </div>
 
-    <button id="toggle-dark-mode" onclick="toggleDarkMode()" data-zh="深色模式" data-en="Dark Mode">深色模式</button>
-
-    <div class="github-link">
-        <a href="https://github.com/HeronSky/Saturn" target="_blank" data-zh="GitHub 專案" data-en="GitHub Project">GitHub 專案</a>
+    <div class="button-group">
+        <button id="toggle-dark-mode" onclick="toggleDarkMode()" data-zh="深色模式" data-en="Dark Mode">深色模式</button>
+        <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">如何使用</button>
+        <button id="github-project-btn" onclick="window.open('https://github.com/HeronSky/Saturn_Static', '_blank')" data-zh="GitHub 專案" data-en="GitHub Project">GitHub 專案</button>
     </div>
 
     <div class="container">
         <h1 data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">Saturn 行星高度變化圖表</h1>
+
+        
+        <div class="modal" id="tutorialModal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeTutorial()">&times;</span>
+                <h2 data-zh="如何使用" data-en="How to Use">如何使用</h2>
+                <ol>
+                    <li>
+                        <strong data-zh="選擇天體" data-en="Select Celestial Bodies">選擇天體</strong>
+                        <p data-zh="選擇一個或多個天體來生成高度變化圖表。" data-en="Select one or more celestial bodies to generate altitude variation charts.">選擇一個或多個天體來生成高度變化圖表。</p>
+                    </li>
+                    <li>
+                        <strong data-zh="設置時間範圍" data-en="Set Time Range">設置時間範圍</strong>
+                        <p data-zh="輸入觀測時間範圍（以小時為單位，例如 8 小時）以定義觀測周期。" data-en="Enter the observation time range (in hours, e.g., 8 hours) to define the observation period.">輸入觀測時間範圍（以小時為單位，例如 8 小時）以定義觀測周期。</p>
+                    </li>
+                    <li>
+                        <strong data-zh="選擇位置" data-en="Choose Location">選擇位置</strong>
+                        <p data-zh="使用當前位置或手動輸入緯度和經度來設置觀測位置。" data-en="Use your current location or manually enter latitude and longitude to set the observation location.">使用當前位置或手動輸入緯度和經度來設置觀測位置。</p>
+                    </li>
+                    <li>
+                        <strong data-zh="生成圖表" data-en="Generate Chart">生成圖表</strong>
+                        <p data-zh="點擊「生成圖表」以顯示選定設置的高度變化圖表。" data-en="Click 'Generate Chart' to display the altitude variation chart based on selected settings.">點擊「生成圖表」以顯示選定設置的高度變化圖表。</p>
+                    </li>
+                    <li>
+                        <strong data-zh="下載圖表" data-en="Download Chart">下載圖表</strong>
+                        <p data-zh="點擊「下載圖表」以 PNG 圖片格式保存圖表，便於離線使用。" data-en="Click 'Download Chart' to save the chart as a PNG image for offline use.">點擊「下載圖表」以 PNG 圖片格式保存圖表，便於離線使用。</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
 
         <div class="form-group">
             <h2 class="checkboxes-title" data-zh="選擇天體" data-en="Select Celestial Bodies">選擇天體</h2>
@@ -329,22 +455,6 @@
         let totalPages = 1;
         let allBodies = [];
 
-        function changeLanguage(lang) {
-            currentLanguage = lang;
-            document.querySelectorAll('[data-zh][data-en]').forEach(el => {
-                el.textContent = el.getAttribute(`data-${lang}`);
-            });
-            updateDarkModeButtonText();
-            renderCheckboxes();
-            renderPagination();
-            updateSelectedBodiesList();
-            document.getElementById('image-format').previousElementSibling.textContent = lang === 'zh' ? '圖片格式：' : 'Image Format:';
-            document.getElementById('image-quality').previousElementSibling.textContent = lang === 'zh' ? '圖片品質：' : 'Image Quality:';
-            document.querySelectorAll('#image-quality option').forEach(option => {
-                option.textContent = option.getAttribute(`data-${lang}`);
-            });
-        }
-
         async function loadBodies() {
             try {
                 const response = await fetch('bodies.txt');
@@ -361,11 +471,39 @@
                         currentCategory = line.replace('Category:', '').trim();
                     } else {
                         const parts = line.split(',').map(part => part.trim());
+                        if (parts.length < 3) return; 
                         const value = parts[0];
                         const zh = parts[1];
                         const en = parts[2];
-                        const extra = parts.slice(3).join(',');
-                        allBodies.push({ value, zh, en, category: currentCategory, extra });
+                        
+                        let bodyObj = { value, zh, en, category: currentCategory };
+
+                        if (parts.length > 4) { 
+                            const raStr = parts[3];
+                            const decStr = parts[4];
+                            const rightAscension = convertRaToDecimal(raStr);
+                            const declination = convertDecToDecimal(decStr);
+                            if (rightAscension !== null && declination !== null) {
+                                bodyObj.rightAscension = rightAscension;
+                                bodyObj.declination = declination;
+                            }
+                        }
+
+                        allBodies.push(bodyObj);
+                    }
+                });
+
+                const userBodies = JSON.parse(localStorage.getItem('userBodies')) || [];
+                userBodies.forEach(body => {
+                    if (body.value && !allBodies.find(b => b.value === body.value)) {
+                        allBodies.push(body);
+                    }
+                });
+
+                
+                selectedBodiesSet.forEach(body => {
+                    if (!allBodies.find(b => b.value === body)) {
+                        selectedBodiesSet.delete(body);
                     }
                 });
 
@@ -373,28 +511,38 @@
                 currentPage = 1;
                 renderCheckboxes();
                 renderPagination();
+                updateSelectedBodiesList();
             } catch (error) {
                 console.error('Error loading bodies.txt:', error);
                 showError(currentLanguage === 'zh' ? '無法載入天體資料' : 'Unable to load celestial bodies data');
             }
         }
 
+        function convertRaToDecimal(ra) {
+            const parts = ra.match(/(\d+)h\s*(\d+)m\s*(\d+(\.\d+)?)s/);
+            if (parts) {
+                const hours = parseFloat(parts[1]);
+                const minutes = parseFloat(parts[2]);
+                const seconds = parseFloat(parts[3]);
+                return hours + (minutes / 60) + (seconds / 3600);
+            }
+            return null;
+        }
+
+        function convertDecToDecimal(dec) {
+            const parts = dec.match(/([+-]?\d+)°\s*(\d+)'?\s*(\d+(\.\d+)?)"?/);
+            if (parts) {
+                const degrees = parseFloat(parts[1]);
+                const minutes = parseFloat(parts[2]);
+                const seconds = parseFloat(parts[3]);
+                return degrees + (minutes / 60) + (seconds / 3600);
+            }
+            return null;
+        }
+
         function renderCheckboxes() {
             const checkboxGroup = document.getElementById('checkbox-group');
             checkboxGroup.innerHTML = '';
-
-            if (currentPage !== 1) {
-                const message = document.createElement('div');
-                message.style.color = 'red';
-                message.style.fontWeight = 'bold';
-                message.style.marginTop = '10px';
-                message.style.textAlign = 'center';
-                message.style.whiteSpace = 'nowrap';
-                message.textContent = currentLanguage === 'zh' 
-                    ? '由於會生成錯誤的圖表，暫時無法選取太陽系外天體' 
-                    : 'Due to generating incorrect charts, selecting exoplanets is temporarily unavailable';
-                checkboxGroup.appendChild(message);
-            }
 
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
@@ -420,14 +568,10 @@
                 checkbox.type = 'checkbox';
                 checkbox.name = 'body';
                 checkbox.value = body.value;
-                checkbox.setAttribute('data-zh', body.zh);
-                checkbox.setAttribute('data-en', body.en);
+                checkbox.setAttribute('data-zh', body.zh || body.name);
+                checkbox.setAttribute('data-en', body.en || body.name);
                 if (selectedBodiesSet.has(body.value)) {
                     checkbox.checked = true;
-                }
-
-                if (currentPage !== 1) {
-                    checkbox.disabled = true;
                 }
 
                 checkbox.addEventListener('change', () => {
@@ -440,9 +584,9 @@
                 });
 
                 const span = document.createElement('span');
-                span.textContent = currentLanguage === 'zh' ? body.zh : body.en;
-                span.setAttribute('data-zh', body.zh);
-                span.setAttribute('data-en', body.en);
+                span.textContent = currentLanguage === 'zh' ? (body.zh || body.name) : (body.en || body.name);
+                span.setAttribute('data-zh', body.zh || body.name);
+                span.setAttribute('data-en', body.en || body.name);
 
                 label.appendChild(checkbox);
                 label.appendChild(span);
@@ -535,7 +679,7 @@
         function getPlanetName(bodyValue) {
             const body = allBodies.find(b => b.value === bodyValue);
             if (!body) return bodyValue;
-            return currentLanguage === 'zh' ? body.zh : body.en;
+            return currentLanguage === 'zh' ? (body.zh || body.name) : (body.en || body.name);
         }
 
         async function generateChart() {
@@ -551,8 +695,8 @@
             const selectedBodies = Array.from(selectedBodiesSet);
             const hours = parseFloat(document.getElementById('hours').value);
             const startTime = document.getElementById('start-time').value;
-            const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
+            const latitude = parseFloat(document.getElementById('latitude').value);
             const imageFormat = document.getElementById('image-format').value;
             const imageQualitySelection = document.getElementById('image-quality').value;
 
@@ -565,6 +709,12 @@
             if (isNaN(latitude) || isNaN(longitude)) {
                 loadingEl.style.display = 'none';
                 showError(currentLanguage === 'zh' ? '請輸入有效的緯度和經度' : 'Please enter valid latitude and longitude');
+                return;
+            }
+
+            if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+                loadingEl.style.display = 'none';
+                showError(currentLanguage === 'zh' ? '請輸入有效的緯度（-90 至 90）和經度（-180 至 180）' : 'Please enter valid latitude (-90 to 90) and longitude (-180 to 180)');
                 return;
             }
 
@@ -589,6 +739,12 @@
                 const traces = [];
 
                 for (let bodyName of selectedBodies) {
+                    const bodyData = allBodies.find(b => b.value === bodyName);
+                    if (!bodyData) {
+                        showError(currentLanguage === 'zh' ? `無法找到天體：${bodyName}` : `Unable to find celestial body: ${bodyName}`);
+                        return;
+                    }
+
                     const altitudes = [];
                     const times = [];
                     for (let dt of timeArray) {
@@ -597,24 +753,23 @@
                         if (astro.Body[bodyName]) {
                             const equCoords = astro.Equator(bodyName, jd, observer, true, true);
                             horizontal = astro.Horizon(jd, observer, equCoords.ra, equCoords.dec, 'normal');
-                        } else {
-                            const bodyData = allBodies.find(b => b.value === bodyName);
-                            if (!bodyData) {
-                                showError(currentLanguage === 'zh' ? `無法找到天體：${bodyName}` : `Unable to find celestial body: ${bodyName}`);
-                                return;
-                            }
-                            const raDec = parseRaDec(bodyData.extra);
-                            if (!raDec) {
-                                showError(currentLanguage === 'zh' ? `RA/Dec 格式錯誤：${bodyData.extra}` : `Invalid RA/Dec format: ${bodyData.extra}`);
-                                return;
-                            }
-                            const ra = raDec.ra;
-                            const dec = raDec.dec;
+                        } else if (bodyData.rightAscension !== undefined && bodyData.declination !== undefined) {
+                            const ra = bodyData.rightAscension;
+                            const dec = bodyData.declination;
                             horizontal = astro.Horizon(jd, observer, ra, dec, 'normal');
+                        } else {
+                            showError(currentLanguage === 'zh' ? `天體資料不完整：${bodyName}` : `Incomplete data for celestial body: ${bodyName}`);
+                            return;
                         }
-                        console.log(`Body: ${bodyName}, Time: ${dt.toISOString()}, Altitude: ${horizontal.altitude}`);
-                        altitudes.push(horizontal.altitude);
-                        times.push(dt);
+
+                        if (horizontal) {
+                            console.log(`處理天體: ${bodyName}, 時間: ${dt.toISOString()}, 高度: ${horizontal.altitude}`);
+                            altitudes.push(horizontal.altitude);
+                            times.push(dt);
+                        } else {
+                            altitudes.push(null);
+                            times.push(dt);
+                        }
                     }
 
                     traces.push({
@@ -677,45 +832,20 @@
                             link.click();
                         };
                     }).catch(function(error) {
-                        console.error('Error generating image:', error);
+                        console.error('生成圖像時出錯:', error);
                         loadingEl.style.display = 'none';
                         showError(currentLanguage === 'zh' ? '生成圖像時出錯' : 'Error generating image');
                     });
                 }).catch(function(error) {
-                    console.error('Error generating chart:', error);
+                    console.error('生成圖表時出錯:', error);
                     loadingEl.style.display = 'none';
                     showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
                 });
             } catch (error) {
-                console.error('Error generating chart:', error);
+                console.error('生成圖表時出錯:', error);
                 loadingEl.style.display = 'none';
                 showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
             }
-        }
-
-        function parseRaDec(raDecString) {
-            const [raStr, decStr] = raDecString.split(',');
-            const ra = parseRa(raStr);
-            const dec = parseDec(decStr);
-            return { ra, dec };
-        }
-
-        function parseRa(raStr) {
-            const matches = raStr.match(/(\d+)h\s*(\d+)m\s*(\d+(\.\d+)?)s/);
-            if (!matches) return 0;
-            const hours = parseFloat(matches[1]);
-            const minutes = parseFloat(matches[2]);
-            const seconds = parseFloat(matches[3]);
-            return (hours + minutes / 60 + seconds / 3600) * 15;
-        }
-
-        function parseDec(decStr) {
-            const matches = decStr.match(/([+-]?\d+)°\s*(\d+)'?\s*(\d+(\.\d+)?)"?/);
-            if (!matches) return 0;
-            const degrees = parseFloat(matches[1]);
-            const minutes = parseFloat(matches[2]);
-            const seconds = parseFloat(matches[3]);
-            return degrees + minutes / 60 + seconds / 3600;
         }
 
         function getCurrentLocation() {
@@ -734,13 +864,13 @@
                 function(error) {
                     let errorMessage = currentLanguage === 'zh' ? '無法獲取位置：' : 'Unable to get location: ';
                     switch(error.code) {
-                        case error.PERMISSION_DENIED:
+                        case 1: 
                             errorMessage += currentLanguage === 'zh' ? '用戶拒絕定位請求' : 'User denied location request';
                             break;
-                        case error.POSITION_UNAVAILABLE:
+                        case 2: 
                             errorMessage += currentLanguage === 'zh' ? '位置資訊不可用' : 'Location information unavailable';
                             break;
-                        case error.TIMEOUT:
+                        case 3: 
                             errorMessage += currentLanguage === 'zh' ? '定位請求超時' : 'Location request timed out';
                             break;
                         default:
@@ -778,6 +908,40 @@
             }
         }
 
+        function openTutorial() {
+            const modal = document.getElementById('tutorialModal');
+            modal.classList.add('active');
+        }
+
+        function closeTutorial() {
+            const modal = document.getElementById('tutorialModal');
+            modal.classList.remove('active');
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            const elements = document.querySelectorAll('[data-zh][data-en]');
+            elements.forEach(el => {
+                el.textContent = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
+            });
+
+            const langButtons = document.querySelectorAll('.language-toggle button');
+            langButtons.forEach(btn => {
+                if (btn.getAttribute('onclick').includes(`'${lang}'`)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+           
+            updateDarkModeButtonText();
+            
+            renderCheckboxes();
+            renderPagination();
+            updateSelectedBodiesList();
+        }
+
         window.onload = async function() {
             const locationBtn = document.getElementById('location-btn');
             if (!navigator.geolocation) {
@@ -785,6 +949,14 @@
             }
             await loadBodies();
             updateDarkModeButtonText();
+            renderCheckboxes();
+            renderPagination();
+            updateSelectedBodiesList();
+
+        
+            currentPage = 1;
+            renderCheckboxes();
+            renderPagination();
 
             const startTimeInput = document.getElementById('start-time');
             const now = new Date();
@@ -795,6 +967,9 @@
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
             startTimeInput.value = localDateTime;
+
+            openTutorial();
+            changeLanguage(currentLanguage);
         };
     </script>
 </body>
