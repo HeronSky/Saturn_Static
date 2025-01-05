@@ -1,20 +1,33 @@
 <!DOCTYPE html>
-<html lang="zh-TW"></html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saturn 行星高度變化圖表</title>
+    <title data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">Saturn Planet Altitude Chart</title>
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min"></script>
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
     <style>
+        :root {
+            --primary-color: #007bff;
+            --background-color: white;
+            --text-color: black;
+            --button-hover-bg: var(--primary-color);
+            --button-hover-text: #ffffff;
+            --button-background: transparent;
+            --button-border: var(--primary-color);
+            --modal-bg: #fefefe;
+            --modal-text: #333;
+            --close-btn-color: #aaaaaa;
+            --close-btn-hover: #000000;
+        }
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             text-align: center;
-            background-color: white;
-            color: black;
+            background-color: var(--background-color);
+            color: var(--text-color);
             transition: background-color 1s ease, color 1s ease;
             position: relative;
         }
@@ -26,32 +39,32 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-color: transparent;
-            border: 2px solid #007bff;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 2px solid var(--button-border);
             border-radius: 8px;
             padding: 8px 16px;
             font-size: 14px;
-            color: #007bff;
             cursor: pointer;
             margin: 10px 5px;
             transition: background-color 1s ease, color 1s ease;
             background-image: none;
             box-shadow: none;
         }
-        button, #generate-btn, #download-btn, #location-btn, .language-toggle button, input {
+        button, #generate-btn, #download-btn, #location-btn, input {
             padding: 8px 16px;
             font-size: 14px;
-            background-color: transparent;
-            color: #007bff;
-            border: 2px solid #007bff;
+            background-color: var(--button-background);
+            color: var(--text-color);
+            border: 2px solid var(--button-border);
             border-radius: 8px;
             cursor: pointer;
             margin: 10px 5px;
             transition: background-color 1s ease, color 1s ease;
         }
-        button:hover, #generate-btn:hover, #download-btn:hover, #location-btn:hover, .language-toggle button:hover {
-            background-color: #007bff;
-            color: #ffffff;
+        button:hover, #generate-btn:hover, #download-btn:hover, #location-btn:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
         }
         #loading, #error {
             display: none;
@@ -86,9 +99,9 @@
         #toggle-dark-mode {
             padding: 8px 16px;
             font-size: 14px;
-            background-color: transparent;
-            color: black;
-            border: 2px solid #000000;
+            background-color: var(--button-background);
+            color: var(--text-color);
+            border: 2px solid var(--button-border);
             border-radius: 8px;
             cursor: pointer;
             margin: 10px 5px;
@@ -98,22 +111,41 @@
             right: 10px;
         }
         #toggle-dark-mode:hover {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
         }
-        .dark-mode #toggle-dark-mode {
-            color: #ffffff;
-            border: 2px solid #ffffff;
+        body.dark-mode {
+            --background-color: #1e1e1e;
+            --text-color: #ffffff;
+            --button-hover-bg: #4ea8de;
+            --button-hover-text: #121212;
+            --button-border: #ffffff;
+            --modal-bg: #2e2e2e;
+            --modal-text: #ffffff;
+            --close-btn-color: #ffffff;
+            --close-btn-hover: #ffffff;
         }
-        .dark-mode #toggle-dark-mode:hover {
+        body.dark-mode #toggle-dark-mode {
+            color: var(--text-color);
+            border: 2px solid var(--button-border);
+        }
+        body.dark-mode #toggle-dark-mode:hover {
             background-color: #ffffff;
             color: #000000;
         }
-        .dark-mode button, .dark-mode #generate-btn, .dark-mode #download-btn, .dark-mode #location-btn, .dark-mode .language-toggle button {
-            color: #4ea8de;
-            border: 2px solid #4ea8de;
+        body.dark-mode button, 
+        body.dark-mode #generate-btn, 
+        body.dark-mode #download-btn, 
+        body.dark-mode #location-btn {
+            color: var(--text-color);
+            border: 2px solid var(--button-border);
         }
-        .dark-mode button:hover, .dark-mode #generate-btn:hover, .dark-mode #download-btn:hover, .dark-mode #location-btn:hover, .dark-mode .language-toggle button:hover {
+        body.dark-mode .pagination button {
+            border: 1px solid #4ea8de;
+            color: #4ea8de;
+        }
+        body.dark-mode .pagination button.active,
+        body.dark-mode .pagination button:hover {
             background-color: #4ea8de;
             color: #121212;
         }
@@ -122,37 +154,33 @@
             text-align: center;
         }
         .github-link a {
-            color: #007bff;
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
         }
         .github-link a:hover {
             text-decoration: underline;
         }
-        .dark-mode {
-            background-color: #1e1e1e;
-            color: #ffffff;
-        }
-        .dark-mode a,
-        .dark-mode a:hover,
-        .dark-mode a:visited {
+        body.dark-mode a,
+        body.dark-mode a:hover,
+        body.dark-mode a:visited {
             color: #4ea8de;
         }
-        .dark-mode .form-group label,
-        .dark-mode h1,
-        .dark-mode label {
-            color: #ffffff;
+        body.dark-mode .form-group label,
+        body.dark-mode h1,
+        body.dark-mode label {
+            color: var(--text-color);
         }
-        .dark-mode input,
-        .dark-mode select {
+        body.dark-mode input,
+        body.dark-mode select {
             background-color: #333333;
             color: #ffffff;
             border: 1px solid #555555;
         }
-        .dark-mode input::placeholder {
+        body.dark-mode input::placeholder {
             color: #aaaaaa;
         }
-        .dark-mode #error {
+        body.dark-mode #error {
             color: #ff6b6b;
         }
         .pagination {
@@ -164,26 +192,17 @@
         .pagination button {
             padding: 6px 12px;
             font-size: 14px;
-            border: 1px solid #007bff;
-            background-color: transparent;
-            color: #007bff;
+            border: 1px solid var(--primary-color);
+            background-color: var(--button-background);
+            color: var(--text-color);
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 1s ease, color 1s ease;
         }
         .pagination button.active,
         .pagination button:hover {
-            background-color: #007bff;
+            background-color: var(--primary-color);
             color: #ffffff;
-        }
-        .dark-mode .pagination button {
-            border: 1px solid #4ea8de;
-            color: #4ea8de;
-        }
-        .dark-mode .pagination button.active,
-        .dark-mode .pagination button:hover {
-            background-color: #4ea8de;
-            color: #121212;
         }
         .selected-bodies-container {
             margin-top: 20px;
@@ -193,7 +212,7 @@
             font-size: 14px;
             font-weight: normal;
             margin-bottom: 5px;
-            color: inherit;
+            color: var(--text-color);
         }
         .selected-bodies {
             display: flex;
@@ -218,14 +237,14 @@
         .body-item:hover {
             background-color: #c0c0c0;
         }
-        .dark-mode .selected-bodies {
+        body.dark-mode .selected-bodies {
             background-color: transparent;
         }
-        .dark-mode .body-item {
+        body.dark-mode .body-item {
             background-color: #555555;
             color: #ffffff;
         }
-        .dark-mode .body-item:hover {
+        body.dark-mode .body-item:hover {
             background-color: #777777;
         }
         .checkboxes-title {
@@ -239,7 +258,7 @@
             font-size: 1.2em;
             margin-top: 15px;
             margin-bottom: 10px;
-            color: inherit;
+            color: var(--text-color);
         }
         .flex-row {
             display: flex;
@@ -269,33 +288,35 @@
             visibility: visible;
         }
         .modal-content {
-            background-color: #fefefe;
+            background-color: var(--modal-bg);
             width: 70%;
             max-width: 600px;
             border-radius: 8px;
             position: relative;
             padding: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            color: #333;
+            color: var(--modal-text);
+            transition: background-color 1s ease, color 1s ease;
         }
-        .dark-mode .modal-content {
+        body.dark-mode .modal-content {
             background-color: #2e2e2e;
             color: #ffffff;
         }
         .close-btn {
+            color: var(--close-btn-color);
             position: absolute;
             top: 15px;
             right: 20px;
             font-size: 28px;
             font-weight: bold;
-            color: #aaaaaa;
+            cursor: pointer;
         }
         .close-btn:hover,
         .close-btn:focus {
-            color: #000000;
+            color: var(--close-btn-hover);
         }
-        .dark-mode .close-btn:hover,
-        .dark-mode .close-btn:focus {
+        body.dark-mode .close-btn:hover,
+        body.dark-mode .close-btn:focus {
             color: #ffffff;
         }
         .modal-content ol {
@@ -305,23 +326,30 @@
         .modal-content li {
             margin-bottom: 15px;
             line-height: 1.6;
-            color: inherit;
+            color: var(--modal-text);
+        }
+        body.dark-mode .modal-content li {
+            color: #ffffff;
         }
         #add-body-form label {
             display: block;
             margin-top: 10px;
             text-align: left;
+            color: var(--text-color);
         }
         #add-body-form input {
             width: 100%;
             padding: 8px;
             margin-top: 5px;
             box-sizing: border-box;
+            background-color: #333333;
+            color: #ffffff;
+            border: 1px solid #555555;
         }
         #add-body-form button {
             margin-top: 15px;
             padding: 10px 20px;
-            background-color: #007bff;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 8px;
@@ -331,61 +359,130 @@
             background-color: #0056b3;
         }
 
-        .language-toggle button.active {
-            background-color: #007bff;
-            color: #ffffff;
-            cursor: default;
-            pointer-events: none;
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            button, #generate-btn, #download-btn, #location-btn, input, select {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+            .checkbox-group {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .pagination {
+                flex-wrap: wrap;
+            }
+            .modal-content {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+
+        /* 語言選擇模態樣式 */
+        .language-modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0,0,0,0.7);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .language-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .language-modal-content {
+            background-color: var(--modal-bg);
+            width: 300px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: var(--modal-text);
+            transition: background-color 1s ease, color 1s ease;
+        }
+        .language-modal-content button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 16px;
+            transition: background-color 1s ease, color 1s ease;
+        }
+        .language-modal-content button:hover {
+            background-color: #0056b3;
         }
     </style>
-    <meta property="og:title" content="Saturn 行星高度變化圖表">
-    <meta property="og:description" content="生成並顯示行星高度變化圖表">
+    <meta property="og:title" content="Saturn 行星高度變化圖表" data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">
+    <meta property="og:description" content="生成並顯示行星高度變化圖表" data-zh="生成並顯示行星高度變化圖表" data-en="Generate and display planetary altitude variation charts">
     <meta property="og:image" content="https://yourwebsite.com/path/to/your/image.jpg">
     <meta property="og:url" content="https://yourwebsite.com">
     <meta property="og:type" content="website">
 </head>
 <body>
-    <div class="language-toggle">
-        <button onclick="changeLanguage('zh')" data-zh="中文" data-en="Chinese">中文</button>
-        <button onclick="changeLanguage('en')" data-zh="英文" data-en="English">English</button>
+    <div class="language-modal" id="languageModal">
+        <div class="language-modal-content">
+            <h2 data-zh="選擇語言" data-en="Choose Language">Choose Language</h2>
+            <button onclick="selectLanguage('zh')" data-zh="中文" data-en="Chinese">中文</button>
+            <button onclick="selectLanguage('en')" data-zh="英文" data-en="English">English</button>
+        </div>
     </div>
 
     <div class="button-group">
-        <button id="toggle-dark-mode" onclick="toggleDarkMode()" data-zh="深色模式" data-en="Dark Mode">深色模式</button>
-        <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">如何使用</button>
-        <button id="github-project-btn" onclick="window.open('https://github.com/HeronSky/Saturn_Static', '_blank')" data-zh="GitHub 專案" data-en="GitHub Project">GitHub 專案</button>
+        <button id="toggle-dark-mode">切換深色模式</button>
+        <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">How to Use</button>
+        <button id="github-project-btn" onclick="window.open('https://github.com/HeronSky/Saturn_Static', '_blank')" data-zh="GitHub 專案" data-en="GitHub Project">GitHub Project</button>
     </div>
 
     <div class="container">
-        <h1 data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">Saturn 行星高度變化圖表</h1>
+        <h1 data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">Saturn Planet Altitude Chart</h1>
 
-        
         <div class="modal" id="tutorialModal">
-            <div class="modal-content">
+            <div class="modal-content" id="tutorialContent">
                 <span class="close-btn" onclick="closeTutorial()">&times;</span>
-                <h2 data-zh="如何使用" data-en="How to Use">如何使用</h2>
-                <ol>
-                    <li>
-                        <strong data-zh="選擇天體" data-en="Select Celestial Bodies">選擇天體</strong>
-                        <p data-zh="選擇一個或多個天體來生成高度變化圖表。" data-en="Select one or more celestial bodies to generate altitude variation charts.">選擇一個或多個天體來生成高度變化圖表。</p>
-                    </li>
-                    <li>
-                        <strong data-zh="設置時間範圍" data-en="Set Time Range">設置時間範圍</strong>
-                        <p data-zh="輸入觀測時間範圍（以小時為單位，例如 8 小時）以定義觀測周期。" data-en="Enter the observation time range (in hours, e.g., 8 hours) to define the observation period.">輸入觀測時間範圍（以小時為單位，例如 8 小時）以定義觀測周期。</p>
-                    </li>
-                    <li>
-                        <strong data-zh="選擇位置" data-en="Choose Location">選擇位置</strong>
-                        <p data-zh="使用當前位置或手動輸入緯度和經度來設置觀測位置。" data-en="Use your current location or manually enter latitude and longitude to set the observation location.">使用當前位置或手動輸入緯度和經度來設置觀測位置。</p>
-                    </li>
-                    <li>
-                        <strong data-zh="生成圖表" data-en="Generate Chart">生成圖表</strong>
-                        <p data-zh="點擊「生成圖表」以顯示選定設置的高度變化圖表。" data-en="Click 'Generate Chart' to display the altitude variation chart based on selected settings.">點擊「生成圖表」以顯示選定設置的高度變化圖表。</p>
-                    </li>
-                    <li>
-                        <strong data-zh="下載圖表" data-en="Download Chart">下載圖表</strong>
-                        <p data-zh="點擊「下載圖表」以 PNG 圖片格式保存圖表，便於離線使用。" data-en="Click 'Download Chart' to save the chart as a PNG image for offline use.">點擊「下載圖表」以 PNG 圖片格式保存圖表，便於離線使用。</p>
-                    </li>
-                </ol>
+                <div id="tutorial-steps" style="text-align: left;">
+                    <div class="tutorial-step" data-step="1">
+                        <h2 data-zh="如何使用 - 步驟 1" data-en="How to Use - Step 1">How to Use - Step 1</h2>
+                        <p data-zh="選擇一個或多個天體來生成高度變化圖表。" data-en="Select one or more celestial bodies to generate altitude variation charts.">Select one or more celestial bodies to generate altitude variation charts.</p>
+                    </div>
+                    <div class="tutorial-step" data-step="2" style="display:none;">
+                        <h2 data-zh="如何使用 - 步驟 2" data-en="How to Use - Step 2">How to Use - Step 2</h2>
+                        <p data-zh="輸入觀測時間範圍，以定義觀測周期。" data-en="Enter the observation time range to define the observation period.">Enter the observation time range to define the observation period.</p>
+                    </div>
+                    <div class="tutorial-step" data-step="3" style="display:none;">
+                        <h2 data-zh="如何使用 - 步驟 3" data-en="How to Use - Step 3">How to Use - Step 3</h2>
+                        <p data-zh="選擇位置或手動輸入緯度和經度。" data-en="Select a location or manually enter latitude and longitude.">Select a location or manually enter latitude and longitude.</p>
+                    </div>
+                    <div class="tutorial-step" data-step="4" style="display:none;">
+                        <h2 data-zh="如何使用 - 步驟 4" data-en="How to Use - Step 4">How to Use - Step 4</h2>
+                        <p data-zh="點擊「生成圖表」顯示行星高度變化圖表，並可下載。" data-en="Click 'Generate Chart' to display the planetary altitude variation chart and download it.">Click 'Generate Chart' to display the planetary altitude variation chart and download it.</p>
+                    </div>
+                    <div class="tutorial-step" data-step="5" style="display:none;">
+                        <h2 data-zh="如何使用 - 步驟 5" data-en="How to Use - Step 5">How to Use - Step 5</h2>
+                        <p data-zh='有問題或是回饋傳送到 <a href="mailto:admin@saturnapp.us.kg">admin@saturnapp.us.kg</a>' data-en='If you have any problems or feedback, send to <a href="mailto:admin@saturnapp.us.kg">admin@saturnapp.us.kg</a>'>
+                            If you have any problems or feedback, send to <a href="mailto:admin@saturnapp.us.kg">admin@saturnapp.us.kg</a>
+                        </p>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button id="prevStep" onclick="prevTutorialStep()" disabled data-zh="上一頁" data-en="Previous">Previous</button>
+                    <button id="nextStep" onclick="nextTutorialStep()" data-zh="下一頁" data-en="Next">Next</button>
+                </div>
             </div>
         </div>
 
@@ -405,20 +502,20 @@
 
         <div class="form-group">
             <label for="hours" data-zh="時間範圍（小時）:" data-en="Time Range (Hours):">時間範圍（小時）:</label>
-            <input type="number" id="hours" name="hours" min="1" max="24" value="8">
+            <input type="number" id="hours" name="hours" min="1" max="24" value="8" data-zh="時間範圍（小時）" data-en="Time Range (Hours)">
         </div>
 
         <div class="form-group">
             <label for="start-time" data-zh="開始時間:" data-en="Start Time:">開始時間:</label>
-            <input type="datetime-local" id="start-time" name="start-time" required>
+            <input type="datetime-local" id="start-time" name="start-time" required data-zh="開始時間" data-en="Start Time">
         </div>
 
         <div class="form-group">
             <label for="latitude" data-zh="緯度:" data-en="Latitude:">緯度:</label>
-            <input type="number" id="latitude" name="latitude" step="0.0001" required>
+            <input type="number" id="latitude" name="latitude" step="0.0001" required data-zh="緯度" data-en="Latitude">
             
             <label for="longitude" data-zh="經度:" data-en="Longitude:">經度:</label>
-            <input type="number" id="longitude" name="longitude" step="0.0001" required>
+            <input type="number" id="longitude" name="longitude" step="0.0001" required data-zh="經度" data-en="Longitude">
             
             <button id="location-btn" onclick="getCurrentLocation()" data-zh="自動獲取位置" data-en="Get Current Location">自動獲取位置</button>
         </div>
@@ -426,9 +523,9 @@
         <div class="form-group flex-row">
             <label for="image-format" data-zh="圖片格式：" data-en="Image Format:">圖片格式：</label>
             <select id="image-format" name="image-format">
-                <option value="png">PNG</option>
-                <option value="jpeg">JPEG</option>
-                <option value="svg">SVG</option>
+                <option value="png" data-zh="PNG" data-en="PNG">PNG</option>
+                <option value="jpeg" data-zh="JPEG" data-en="JPEG">JPEG</option>
+                <option value="svg" data-zh="SVG" data-en="SVG">SVG</option>
             </select>
 
             <label for="image-quality" data-zh="圖片品質：" data-en="Image Quality:">圖片品質：</label>
@@ -447,8 +544,13 @@
         <button id="download-btn" onclick="downloadImage()" style="display: none;" data-zh="下載圖片" data-en="Download Image">下載圖片</button>
     </div>
 
+    <div class="contact-info">
+        <h2>Contact Information</h2>
+        <p>Email: <a href="mailto:admin@saturnapp.us.kg">admin@saturnapp.us.kg</a></p>
+    </div>
+
     <script>
-        let currentLanguage = 'zh';
+        let currentLanguage = 'en'; // 預設語言為英文
         let selectedBodiesSet = new Set();
         let currentPage = 1;
         const itemsPerPage = 9;
@@ -462,7 +564,9 @@
                     throw new Error('Network response was not ok');
                 }
                 const text = await response.text();
-                const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('//'));
+                const lines = text.split('\n')
+                                  .map(line => line.trim())
+                                  .filter(line => line && !line.startsWith('//'));
 
                 let currentCategory = '';
                 allBodies = [];
@@ -488,22 +592,7 @@
                                 bodyObj.declination = declination;
                             }
                         }
-
                         allBodies.push(bodyObj);
-                    }
-                });
-
-                const userBodies = JSON.parse(localStorage.getItem('userBodies')) || [];
-                userBodies.forEach(body => {
-                    if (body.value && !allBodies.find(b => b.value === body.value)) {
-                        allBodies.push(body);
-                    }
-                });
-
-                
-                selectedBodiesSet.forEach(body => {
-                    if (!allBodies.find(b => b.value === body)) {
-                        selectedBodiesSet.delete(body);
                     }
                 });
 
@@ -676,10 +765,10 @@
             });
         }
 
-        function getPlanetName(bodyValue) {
+        function getPlanetName(bodyValue, lang = currentLanguage) {
             const body = allBodies.find(b => b.value === bodyValue);
             if (!body) return bodyValue;
-            return currentLanguage === 'zh' ? (body.zh || body.name) : (body.en || body.name);
+            return lang === 'zh' ? (body.zh || body.name) : (body.en || body.name);
         }
 
         async function generateChart() {
@@ -731,8 +820,11 @@
 
                 const deltaHours = hours;
                 const timeArray = [];
-                for (let i = 0; i <= deltaHours * 4; i++) {
-                    let dt = new Date(startDate.getTime() + (i * 15 * 60000));
+                const totalMilliseconds = deltaHours * 60 * 60 * 1000;
+                const step = totalMilliseconds / 100; // 每1%時間範圍的間隔
+
+                for (let i = 0; i <= 100; i++) {
+                    let dt = new Date(startDate.getTime() + (i * step));
                     timeArray.push(dt);
                 }
 
@@ -763,7 +855,6 @@
                         }
 
                         if (horizontal) {
-                            console.log(`處理天體: ${bodyName}, 時間: ${dt.toISOString()}, 高度: ${horizontal.altitude}`);
                             altitudes.push(horizontal.altitude);
                             times.push(dt);
                         } else {
@@ -776,7 +867,8 @@
                         x: times,
                         y: altitudes,
                         mode: 'lines',
-                        name: getPlanetName(bodyName)
+                        name: getPlanetName(bodyName),
+                        line: { shape: 'spline' } // 添加平滑曲線
                     });
                 }
 
@@ -785,7 +877,7 @@
                     xaxis: {
                         title: currentLanguage === 'zh' ? '當地時間' : 'Local Time',
                         tickformat: '%H:%M',
-                        nticks: deltaHours + 1
+                        nticks: Math.min(12, deltaHours + 1)
                     },
                     yaxis: {
                         title: currentLanguage === 'zh' ? '高度 (度)' : 'Altitude (degrees)'
@@ -827,7 +919,7 @@
                         downloadBtn.style.display = 'block';
                         downloadBtn.onclick = function() {
                             const link = document.createElement('a');
-                            link.href = dataUrl;
+                            link.href = img.src;
                             link.download = 'chart.' + imageFormat;
                             link.click();
                         };
@@ -885,6 +977,11 @@
 
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
+            if(document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
             updateDarkModeButtonText();
             renderCheckboxes();
             renderPagination();
@@ -916,47 +1013,59 @@
         function closeTutorial() {
             const modal = document.getElementById('tutorialModal');
             modal.classList.remove('active');
+            currentStep = 1;
+            updateTutorialSteps();
+            updateButtons();
         }
 
-        function changeLanguage(lang) {
+        function selectLanguage(lang) {
             currentLanguage = lang;
             const elements = document.querySelectorAll('[data-zh][data-en]');
             elements.forEach(el => {
-                el.textContent = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
-            });
-
-            const langButtons = document.querySelectorAll('.language-toggle button');
-            langButtons.forEach(btn => {
-                if (btn.getAttribute('onclick').includes(`'${lang}'`)) {
-                    btn.classList.add('active');
+                if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea') {
+                    el.placeholder = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
                 } else {
-                    btn.classList.remove('active');
+                    el.innerHTML = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
                 }
             });
 
-           
-            updateDarkModeButtonText();
-            
+            const langModal = document.getElementById('languageModal');
+            langModal.classList.remove('active');
+
             renderCheckboxes();
             renderPagination();
             updateSelectedBodiesList();
+            updateTutorialSteps();
+            updateButtons();
+        }
+
+        function applyColorScheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if(savedTheme === 'dark'){
+                document.body.classList.add('dark-mode');
+            } else if(savedTheme === 'light'){
+                document.body.classList.remove('dark-mode');
+            } else {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+            updateDarkModeButtonText();
         }
 
         window.onload = async function() {
-            const locationBtn = document.getElementById('location-btn');
-            if (!navigator.geolocation) {
-                locationBtn.style.display = 'none';
-            }
+            const languageModal = document.getElementById('languageModal');
+            languageModal.classList.add('active');
+
             await loadBodies();
-            updateDarkModeButtonText();
+            applyColorScheme();
             renderCheckboxes();
             renderPagination();
             updateSelectedBodiesList();
-
-        
-            currentPage = 1;
-            renderCheckboxes();
-            renderPagination();
+            updateTutorialSteps();
+            updateButtons();
 
             const startTimeInput = document.getElementById('start-time');
             const now = new Date();
@@ -968,9 +1077,117 @@
             const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
             startTimeInput.value = localDateTime;
 
-            openTutorial();
-            changeLanguage(currentLanguage);
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (e.matches) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+                updateDarkModeButtonText();
+                renderCheckboxes();
+                renderPagination();
+                updateSelectedBodiesList();
+            });
+
+            // Remove 'onclick' attributes and add event listeners
+
+            // Remove 'onclick' from toggle-dark-mode button
+            const toggleDarkModeBtn = document.getElementById('toggle-dark-mode');
+            toggleDarkModeBtn.removeAttribute('onclick');
+
+            // Ensure event listener is added
+            toggleDarkModeBtn.addEventListener('click', toggleDarkMode);
+
+            // Remove 'onclick' from open-tutorial-btn and add event listener
+            const openTutorialBtn = document.getElementById('open-tutorial-btn');
+            openTutorialBtn.removeAttribute('onclick');
+            openTutorialBtn.addEventListener('click', openTutorial);
+
+            // Remove 'onclick' from github-project-btn and add event listener
+            const githubProjectBtn = document.getElementById('github-project-btn');
+            githubProjectBtn.removeAttribute('onclick');
+            githubProjectBtn.addEventListener('click', function() {
+                window.open('https://github.com/HeronSky/Saturn_Static', '_blank');
+            });
+
+            // Remove 'onclick' from generate-btn and add event listener
+            const generateBtn = document.getElementById('generate-btn');
+            generateBtn.removeAttribute('onclick');
+            generateBtn.addEventListener('click', generateChart);
+
+            // Remove 'onclick' from download-btn and add event listener
+            const downloadBtn = document.getElementById('download-btn');
+            downloadBtn.removeAttribute('onclick');
+            downloadBtn.addEventListener('click', downloadImage);
+
+            // Remove 'onclick' from location-btn and add event listener
+            const locationBtnFinal = document.getElementById('location-btn');
+            locationBtnFinal.removeAttribute('onclick');
+            locationBtnFinal.addEventListener('click', getCurrentLocation);
         };
+
+        let currentStep = 1;
+
+        function nextTutorialStep() {
+            const steps = document.querySelectorAll('.tutorial-step');
+            if (currentStep < steps.length) {
+                steps[currentStep - 1].style.display = 'none';
+                currentStep++;
+                steps[currentStep - 1].style.display = 'block';
+                updateButtons();
+
+                // 檢查是否為最後一步
+                if (currentStep === steps.length) {
+                    document.getElementById('nextStep').textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
+                }
+            } else if (currentStep === steps.length) {
+                closeTutorial();
+                currentStep = 1; // 重置步驟以便下次使用
+                updateButtons();
+                document.getElementById('nextStep').textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
+            }
+        }
+
+        function prevTutorialStep() {
+            const steps = document.querySelectorAll('.tutorial-step');
+            if (currentStep > 1) {
+                steps[currentStep - 1].style.display = 'none';
+                currentStep--;
+                steps[currentStep - 1].style.display = 'block';
+                updateButtons();
+            }
+        }
+
+        function updateButtons() {
+            const steps = document.querySelectorAll('.tutorial-step');
+            const prevBtn = document.getElementById('prevStep');
+            const nextBtn = document.getElementById('nextStep');
+            prevBtn.disabled = currentStep === 1;
+
+            if (currentStep === steps.length) {
+                nextBtn.textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
+            } else {
+                nextBtn.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
+            }
+        }
+
+        function updateTutorialSteps() {
+            const steps = document.querySelectorAll('.tutorial-step');
+            steps.forEach((step, index) => {
+                step.style.display = index === (currentStep - 1) ? 'block' : 'none';
+            });
+
+            // 更新按鈕文字
+            const nextBtn = document.getElementById('nextStep');
+            if (currentStep === steps.length) {
+                nextBtn.textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
+            } else {
+                nextBtn.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
+            }
+
+            const prevBtn = document.getElementById('prevStep');
+            prevBtn.disabled = currentStep === 1;
+        }
     </script>
 </body>
 </html>
