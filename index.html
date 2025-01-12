@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device=width, initial-scale=1.0">
     <title data-zh="SkyVault" data-en="SkyVault">SkyVault</title>
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min"></script>
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
@@ -91,10 +91,14 @@
         }
         .button-group {
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 10px;
+            justify-content: space-between;
             align-items: center;
+            gap: 10px;
+        }
+        .right-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         #toggle-dark-mode {
             padding: 8px 16px;
@@ -383,7 +387,6 @@
             }
         }
 
-        /* 語言選擇模態樣式 */
         .language-modal {
             opacity: 0;
             visibility: hidden;
@@ -427,6 +430,61 @@
         .language-modal-content button:hover {
             background-color: #0056b3;
         }
+
+        .settings-modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            position: fixed;
+            z-index: 1002;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0,0,0,0.7);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        .settings-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .settings-modal-content {
+            background-color: var(--modal-bg);
+            width: 300px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: var(--modal-text);
+            transition: background-color 1s ease, color 1s ease;
+        }
+
+        .settings-modal-content button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 16px;
+            transition: background-color 1s ease, color 1s ease;
+        }
+
+        .settings-modal-content button:hover {
+            background-color: #0056b3;
+        }
+
+        .center-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
     </style>
     <meta property="og:title" content="SkyVault" data-zh="SkyVault" data-en="SkyVault">
     <meta property="og:description" content="生成並顯示行星高度變化圖表" data-zh="一個能顯示天體高度變化的網站" data-en="Generate and display planetary altitude variation charts">
@@ -439,14 +497,44 @@
         <div class="language-modal-content">
             <h2 data-zh="選擇語言" data-en="Choose Language">Choose Language</h2>
             <button onclick="selectLanguage('zh')" data-zh="中文" data-en="Chinese">中文</button>
-            <button onclick="selectLanguage('en')" data-zh="英文" data-en="English">English</button>
+            <button onclick="selectLanguage('en')" data-zh="English" data-en="English">English</button>
         </div>
     </div>
 
     <div class="button-group">
-        <button id="toggle-dark-mode">切換深色模式</button>
-        <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">如何使用</button>
-        <button id="github-project-btn" onclick="window.open('https://github.com/HeronSky/Saturn_Static', '_blank')" data-zh="GitHub 專案" data-en="GitHub Project">GitHub Project</button>
+        <div>
+            <button id="toggle-dark-mode">切換深色模式</button>
+        </div>
+        <div class="center-buttons">
+            <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">如何使用</button>
+            <button id="github-project-btn" onclick="window.open('https://github.com/HeronSky/Saturn_Static', '_blank')" data-zh="GitHub 專案" data-en="GitHub Project">GitHub Project</button>
+            <button id="settings-btn" data-zh="設定" data-en="Settings">設定</button>
+        </div>
+        <div class="right-controls">
+        </div>
+    </div>
+
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-modal-content">
+            <span class="close-btn"ㄥ onclick="closeSettings()">&times;</span>
+            <h2 data-zh="設定" data-en="Settings">設定</h2>
+            <div class="form-group">
+                <label for="font-size" data-zh="字體大小:" data-en="Font Size:">字體大小:</label>
+                <select id="font-size" name="font-size">
+                    <option value="small" data-zh="小" data-en="Small">小</option>
+                    <option value="medium" data-zh="中" data-en="Medium" selected>中</option>
+                    <option value="large" data-zh="大" data-en="Large">大</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="language-select" data-zh="Language:" data-en="Language:">Language:</label>
+                <select id="language-select" name="language-select">
+                    <option value="zh" data-zh="中文" data-en="中文">中文</option>
+                    <option value="en" data-zh="English" data-en="English" selected>English</option>
+                </select>
+            </div>
+            <button id="confirm-settings-btn" data-zh="確定" data-en="Confirm">確定</button>
+        </div>
     </div>
 
     <div class="container">
@@ -549,14 +637,13 @@
     </div>
 
     <script>
-        let currentLanguage = 'en'; // 預設語言為英文
+        let currentLanguage = 'en';  
         let selectedBodiesSet = new Set();
         let currentPage = 1;
         const itemsPerPage = 9;
         let totalPages = 1;
         let allBodies = [];
 
-        // 載入已選取的天體
         function loadSelectedBodies() {
             const savedSelectedBodies = localStorage.getItem('selectedBodies');
             if (savedSelectedBodies) {
@@ -571,7 +658,7 @@
 
         async function loadBodies() {
             try {
-                loadSelectedBodies(); // 載入已選取的天體
+                loadSelectedBodies(); 
                 const response = await fetch('bodies.txt');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -683,7 +770,6 @@
                         selectedBodiesSet.delete(body.value);
                     }
                     updateSelectedBodiesList();
-                    // 更新 localStorage
                     localStorage.setItem('selectedBodies', JSON.stringify(Array.from(selectedBodiesSet)));
                 });
 
@@ -1041,7 +1127,7 @@
                 if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea') {
                     el.placeholder = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
                 } else {
-                    el.innerHTML = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
+                    el.textContent = lang === 'zh' ? (el.getAttribute('data-zh') || el.textContent) : (el.getAttribute('data-en') || el.textContent);
                 }
             });
 
@@ -1069,6 +1155,93 @@
                 }
             }
             updateDarkModeButtonText();
+        }
+
+        // 新增保存字體大小的函數
+        function saveFontSize() {
+            const fontSize = document.getElementById('font-size').value;
+            if (fontSize === 'small') {
+                document.body.style.fontSize = '14px';
+            } else if (fontSize === 'medium') {
+                document.body.style.fontSize = '16px';
+            } else if (fontSize === 'large') {
+                document.body.style.fontSize = '18px';
+            }
+            localStorage.setItem('fontSize', fontSize);
+        }
+
+        // 新增保存語言的函數
+        function saveLanguage() {
+            const language = document.getElementById('language-select').value;
+            localStorage.setItem('language', language);
+            currentLanguage = language;
+            applyLanguage();
+        }
+
+        // 更新事件監聽器，分離字體大小和語言的保存
+        document.getElementById('font-size').removeEventListener('change', saveSettings);
+        document.getElementById('font-size').addEventListener('change', saveFontSize);
+
+        document.getElementById('language-select').removeEventListener('change', saveSettings);
+        document.getElementById('language-select').addEventListener('change', saveLanguage);
+
+        function saveSettings() {
+            const fontSize = document.getElementById('font-size').value;
+            if (fontSize === 'small') {
+                document.body.style.fontSize = '14px';
+            } else if (fontSize === 'medium') {
+                document.body.style.fontSize = '16px';
+            } else if (fontSize === 'large') {
+                document.body.style.fontSize = '18px';
+            }
+            localStorage.setItem('fontSize', fontSize);
+
+            const language = document.getElementById('language-select').value;
+            localStorage.setItem('language', language);
+            currentLanguage = language;
+            applyLanguage();
+        }
+
+        function loadSettings() {
+            const savedFontSize = localStorage.getItem('fontSize');
+            if (savedFontSize) {
+                document.getElementById('font-size').value = savedFontSize;
+                if (savedFontSize === 'small') {
+                    document.body.style.fontSize = '14px';
+                } else if (savedFontSize === 'medium') {
+                    document.body.style.fontSize = '16px';
+                } else if (savedFontSize === 'large') {
+                    document.body.style.fontSize = '18px';
+                }
+            }
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage) {
+                currentLanguage = savedLanguage;
+                document.getElementById('language-select').value = savedLanguage;
+            } else {
+                document.getElementById('language-select').value = currentLanguage;
+            }
+        }
+
+        function applyLanguage() {
+            const elements = document.querySelectorAll('[data-zh][data-en]');
+            elements.forEach(el => {
+                el.textContent = el.getAttribute(`data-${currentLanguage}`);
+            });
+            updateDarkModeButtonText();
+        }
+
+        document.getElementById('confirm-settings-btn').addEventListener('click', () => {
+            saveSettings();
+            closeSettings();
+        });
+
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
         }
 
         window.onload = async function() {
@@ -1105,41 +1278,49 @@
                 updateSelectedBodiesList();
             });
 
-            // Remove 'onclick' attributes and add event listeners
-
-            // Remove 'onclick' from toggle-dark-mode button
             const toggleDarkModeBtn = document.getElementById('toggle-dark-mode');
             toggleDarkModeBtn.removeAttribute('onclick');
-
-            // Ensure event listener is added
             toggleDarkModeBtn.addEventListener('click', toggleDarkMode);
 
-            // Remove 'onclick' from open-tutorial-btn and add event listener
             const openTutorialBtn = document.getElementById('open-tutorial-btn');
             openTutorialBtn.removeAttribute('onclick');
             openTutorialBtn.addEventListener('click', openTutorial);
 
-            // Remove 'onclick' from github-project-btn and add event listener
             const githubProjectBtn = document.getElementById('github-project-btn');
             githubProjectBtn.removeAttribute('onclick');
             githubProjectBtn.addEventListener('click', function() {
                 window.open('https://github.com/HeronSky/Saturn_Static', '_blank');
             });
 
-            // Remove 'onclick' from generate-btn and add event listener
             const generateBtn = document.getElementById('generate-btn');
             generateBtn.removeAttribute('onclick');
             generateBtn.addEventListener('click', generateChart);
 
-            // Remove 'onclick' from download-btn and add event listener
             const downloadBtn = document.getElementById('download-btn');
             downloadBtn.removeAttribute('onclick');
             downloadBtn.addEventListener('click', downloadImage);
 
-            // Remove 'onclick' from location-btn and add event listener
             const locationBtnFinal = document.getElementById('location-btn');
             locationBtnFinal.removeAttribute('onclick');
             locationBtnFinal.addEventListener('click', getCurrentLocation);
+
+            const settingsBtn = document.getElementById('settings-btn');
+            settingsBtn.addEventListener('click', openSettings);
+
+            const confirmSettingsBtn = document.getElementById('confirm-settings-btn');
+            confirmSettingsBtn.addEventListener('click', () => {
+                const selectedLanguage = document.getElementById('language-select').value;
+                selectLanguage(selectedLanguage);
+                closeSettings();
+            });
+
+            const fontSizeSelect = document.getElementById('font-size');
+            fontSizeSelect.addEventListener('change', saveFontSize);
+
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.addEventListener('change', saveLanguage);
+
+            loadSettings();
         };
 
         let currentStep = 1;
@@ -1152,13 +1333,12 @@
                 steps[currentStep - 1].style.display = 'block';
                 updateButtons();
 
-                // 檢查是否為最後一步
                 if (currentStep === steps.length) {
                     document.getElementById('nextStep').textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
                 }
             } else if (currentStep === steps.length) {
                 closeTutorial();
-                currentStep = 1; // 重置步驟以便下次使用
+                currentStep = 1;
                 updateButtons();
                 document.getElementById('nextStep').textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
             }
@@ -1193,7 +1373,6 @@
                 step.style.display = index === (currentStep - 1) ? 'block' : 'none';
             });
 
-            // 更新按鈕文字
             const nextBtn = document.getElementById('nextStep');
             if (currentStep === steps.length) {
                 nextBtn.textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
