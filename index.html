@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">Saturn Planet Altitude Chart</title>
+    <title data-zh="SkyVault" data-en="SkyVault">SkyVault</title>
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min"></script>
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
     <style>
@@ -11,10 +11,10 @@
             --primary-color: #007bff;
             --background-color: white;
             --text-color: black;
-            --button-hover-bg: var(--primary-color);
+            --button-hover-bg: #007bff;
             --button-hover-text: #ffffff;
             --button-background: transparent;
-            --button-border: var(--primary-color);
+            --button-border: #007bff;
             --modal-bg: #fefefe;
             --modal-text: #333;
             --close-btn-color: #aaaaaa;
@@ -428,10 +428,10 @@
             background-color: #0056b3;
         }
     </style>
-    <meta property="og:title" content="Saturn 行星高度變化圖表" data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">
-    <meta property="og:description" content="生成並顯示行星高度變化圖表" data-zh="生成並顯示行星高度變化圖表" data-en="Generate and display planetary altitude variation charts">
+    <meta property="og:title" content="SkyVault" data-zh="SkyVault" data-en="SkyVault">
+    <meta property="og:description" content="生成並顯示行星高度變化圖表" data-zh="一個能顯示天體高度變化的網站" data-en="Generate and display planetary altitude variation charts">
     <meta property="og:image" content="https://yourwebsite.com/path/to/your/image.jpg">
-    <meta property="og:url" content="https://yourwebsite.com">
+    <meta property="og:url" content="https://starview.space">
     <meta property="og:type" content="website">
 </head>
 <body>
@@ -445,37 +445,36 @@
 
     <div class="button-group">
         <button id="toggle-dark-mode">切換深色模式</button>
-        <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">How to Use</button>
+        <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">如何使用</button>
         <button id="github-project-btn" onclick="window.open('https://github.com/HeronSky/Saturn_Static', '_blank')" data-zh="GitHub 專案" data-en="GitHub Project">GitHub Project</button>
     </div>
 
     <div class="container">
-        <h1 data-zh="Saturn 行星高度變化圖表" data-en="Saturn Planet Altitude Chart">Saturn Planet Altitude Chart</h1>
-
+        <h1 data-zh="SkyVault天體變化圖表" data-en="SkyVault Celestial Variation Chart">SkyVault天體變化圖表</h1>
         <div class="modal" id="tutorialModal">
             <div class="modal-content" id="tutorialContent">
                 <span class="close-btn" onclick="closeTutorial()">&times;</span>
                 <div id="tutorial-steps" style="text-align: left;">
                     <div class="tutorial-step" data-step="1">
-                        <h2 data-zh="如何使用 - 步驟 1" data-en="How to Use - Step 1">How to Use - Step 1</h2>
-                        <p data-zh="選擇一個或多個天體來生成高度變化圖表。" data-en="Select one or more celestial bodies to generate altitude variation charts.">Select one or more celestial bodies to generate altitude variation charts.</p>
+                        <h2 data-zh="如何使用 - 步驟 1" data-en="How to Use - Step 1">如何使用 - 步驟 1</h2>
+                        <p data-zh="選擇一個或多個天體來生成高度變化圖表。" data-en="Select one or more celestial bodies to generate altitude variation charts.">選擇一個或多個天體來生成高度變化圖表。</p>
                     </div>
                     <div class="tutorial-step" data-step="2" style="display:none;">
-                        <h2 data-zh="如何使用 - 步驟 2" data-en="How to Use - Step 2">How to Use - Step 2</h2>
-                        <p data-zh="輸入觀測時間範圍，以定義觀測周期。" data-en="Enter the observation time range to define the observation period.">Enter the observation time range to define the observation period.</p>
+                        <h2 data-zh="如何使用 - 步驟 2" data-en="How to Use - Step 2">如何使用 - 步驟 2</h2>
+                        <p data-zh="輸入觀測時間範圍，以定義觀測周期。" data-en="Enter the observation time range to define the observation period.">輸入觀測時間範圍，以定義觀測周期。</p>
                     </div>
                     <div class="tutorial-step" data-step="3" style="display:none;">
-                        <h2 data-zh="如何使用 - 步驟 3" data-en="How to Use - Step 3">How to Use - Step 3</h2>
-                        <p data-zh="選擇位置或手動輸入緯度和經度。" data-en="Select a location or manually enter latitude and longitude.">Select a location or manually enter latitude and longitude.</p>
+                        <h2 data-zh="如何使用 - 步驟 3" data-en="How to Use - Step 3">如何使用 - 步驟 3</h2>
+                        <p data-zh="選擇位置或手動輸入緯度和經度。" data-en="Select a location or manually enter latitude and longitude.">選擇位置或手動輸入緯度和經度。</p>
                     </div>
                     <div class="tutorial-step" data-step="4" style="display:none;">
-                        <h2 data-zh="如何使用 - 步驟 4" data-en="How to Use - Step 4">How to Use - Step 4</h2>
-                        <p data-zh="點擊「生成圖表」顯示行星高度變化圖表，並可下載。" data-en="Click 'Generate Chart' to display the planetary altitude variation chart and download it.">Click 'Generate Chart' to display the planetary altitude variation chart and download it.</p>
+                        <h2 data-zh="如何使用 - 步驟 4" data-en="How to Use - Step 4">如何使用 - 步驟 4</h2>
+                        <p data-zh="點擊「生成圖表」顯示行星高度變化圖表，並可下載。" data-en="Click 'Generate Chart' to display the planetary altitude variation chart and download it.">點擊「生成圖表」顯示行星高度變化圖表，並可下載。</p>
                     </div>
                     <div class="tutorial-step" data-step="5" style="display:none;">
-                        <h2 data-zh="如何使用 - 步驟 5" data-en="How to Use - Step 5">How to Use - Step 5</h2>
-                        <p data-zh='有問題或是回饋傳送到 <a href="mailto:admin@saturnapp.us.kg">admin@saturnapp.us.kg</a>' data-en='If you have any problems or feedback, send to <a href="mailto:admin@saturnapp.us.kg">admin@saturnapp.us.kg</a>'>
-                            If you have any problems or feedback, send to <a href="mailto:admin@saturnapp.us.kg">admin@saturnapp.us.kg</a>
+                        <h2 data-zh="如何使用 - 步驟 5" data-en="How to Use - Step 5">如何使用 - 步驟 5</h2>
+                        <p data-zh='有問題或是回饋傳送到 <a href="mailto:admin@starview.space">admin@starview.space</a>' data-en='If you have any problems or feedback, send to <a href="mailto:admin@starview.space">admin@starview.space</a>'>
+                            如果有任何問題或建議，請發送到 <a href="mailto:admin@starview.space">admin@starview.space</a>
                         </p>
                     </div>
                 </div>
@@ -546,7 +545,7 @@
 
     <div class="contact-info">
         <h2>Contact Information</h2>
-        <p>Email: <a href="mailto:admin@saturnapp.us.kg">admin@saturnapp.us.kg</a></p>
+        <p>Email: <a href="mailto:admin@starview.space">admin@starview.space</a></p>
     </div>
 
     <script>
@@ -557,8 +556,22 @@
         let totalPages = 1;
         let allBodies = [];
 
+        // 載入已選取的天體
+        function loadSelectedBodies() {
+            const savedSelectedBodies = localStorage.getItem('selectedBodies');
+            if (savedSelectedBodies) {
+                try {
+                    const parsed = JSON.parse(savedSelectedBodies);
+                    selectedBodiesSet = new Set(parsed);
+                } catch (e) {
+                    console.error('Error parsing selectedBodies from localStorage:', e);
+                }
+            }
+        }
+
         async function loadBodies() {
             try {
+                loadSelectedBodies(); // 載入已選取的天體
                 const response = await fetch('bodies.txt');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -670,6 +683,8 @@
                         selectedBodiesSet.delete(body.value);
                     }
                     updateSelectedBodiesList();
+                    // 更新 localStorage
+                    localStorage.setItem('selectedBodies', JSON.stringify(Array.from(selectedBodiesSet)));
                 });
 
                 const span = document.createElement('span');
@@ -760,6 +775,7 @@
                     updateSelectedBodiesList();
                     const checkbox = document.querySelector(`input[value="${body}"]`);
                     if (checkbox) checkbox.checked = false;
+                    localStorage.setItem('selectedBodies', JSON.stringify(Array.from(selectedBodiesSet)));
                 };
                 container.appendChild(div);
             });
