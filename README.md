@@ -1,4 +1,4 @@
-# SkyVault: A Static Deployment of Saturn Planet Altitude Chart  
+# SkyVault: Celestial Variation Chart  
 
 **SkyVault** is an improved version of [Saturn](https://github.com/HeronSky/Saturn), offering easier deployment with static web pages. It now supports **dark mode** and automatically adjusts chart times based on your local timezone.  
 
@@ -10,9 +10,8 @@
 - Select celestial bodies such as Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, the Moon, and the Sun.  
 - Customize the observation time range (default: 8 hours).  
 - Use your current location or manually input latitude and longitude.  
-- Dark mode support for better visualization.  
 - Automatically adjusts time labels based on the user's timezone.  
-- Generate and download altitude charts as PNG images.  
+- Generate and download altitude charts.  
 
 ---
 
@@ -36,7 +35,7 @@ Click **"Download Plot"** to save the chart as a PNG image for offline use.
 
 ---
 
-# SkyVault: 靜態部署的行星高度變化圖表  
+# SkyVault: 天體高度變化圖表  
 
 **SkyVault** 是 [Saturn](https://github.com/HeronSky/Saturn) 的改進版本，提供更方便的靜態網頁部署。它新增了 **深色模式**，並根據用戶的時區自動調整圖表時間標籤。  
 
@@ -48,9 +47,8 @@ Click **"Download Plot"** to save the chart as a PNG image for offline use.
 - 選擇水星、金星、火星、木星、土星、天王星、海王星、月亮和太陽等天體。  
 - 自定義觀測時間範圍（默認：8 小時）。  
 - 支援自動定位或手動輸入緯度和經度。  
-- 支援深色模式，提升可視化效果。  
 - 圖表時間標籤會自動按照用戶的時區調整。  
-- 生成並下載高度變化圖表（PNG 圖片）。  
+- 生成並下載高度變化圖表。  
 
 ---
 
