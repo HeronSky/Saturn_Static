@@ -9,24 +9,46 @@ Uranus,天王星,Uranus
 Neptune,海王星,Neptune
 Moon,月球,Moon
 
-Category:星系
-M31,M31(仙女座星系),M31(Andromeda Galaxy),0h 42m 44.3s,+41°16'9"
-M33,M33(三角座星系),M33(Triangulum Galaxy),1h 33m 50s,+30°39'36"
-M51,M51(渦狀星系),M51(Whirlpool Galaxy),13h 29m 52s,+47°11'43"
-M81,M81(波德星系),M81(Bode's Galaxy),9h 55m 33s,+69°3'55"
-M82,M82(雪茄星系),M82(Cigar Galaxy),9h 55m 52s,+69°40'47"
-M101,M101(風車星系),M101(Pinwheel Galaxy),14h 03m 12s,+54°20'57"
-M104,M104(草帽星系),M104(Sombrero Galaxy),12h 39m 59s,-11°37'23"
-NGC253,NGC 253(玉夫座星系),NGC 253(Sculptor Galaxy),0h 47m 33s,-25°17'20"
-NGC1300,NGC 1300(棒旋星系),NGC 1300(Barred Spiral Galaxy),3h 19m 41s,-19°24'40"
+Category:春季
+IC342, IC342, IC342, 3h 46m 46s, +68°43'18"
+M1, M1, M1, 5h 34m 31.97s, +22°0'52.1"
+M31, M31, M31, 0h 42m 44.3s, +41°16'9"
+M33, M33, M33, 1h 33m 50s, +30°39'36"
+M51, M51, M51, 13h 29m 52s, +47°11'43"
+M104, M104, M104, 12h 39m 59s, -11°37'23"
+NGC1300, NGC1300, NGC1300, 3h 19m 41s, -19°24'40"
+NGC1365, NGC1365, NGC1365, 3h 33m 50s, -29°34'05"
+NGC253, NGC253, NGC253, 0h 47m 33s, -25°17'20"
 
-Category:星雲
-M1,M1(蟹狀星雲),M1(Crab Nebula),5h 34m 31.97s,+22°0'52.1"
-M8,M8(潟湖星雲),M8(Lagoon Nebula),18h 3m 37s,-24°23'12"
-M16,M16(鷹星雲),M16(Eagle Nebula),18h 18m 48s,-13°49'0"
-M20,M20(三裂星雲),M20(Trifid Nebula),17h 59m 1s,-23°1'0"
-M27,M27(啞鈴星雲),M27(Dumbbell Nebula),19h 59m 36s,+22°43'16"
-M42,M42(獵戶座星雲),M42(Orion Nebula),5h 35m 17.3s,-5°23'28"
-M57,M57(環狀星雲),M57(Ring Nebula),18h 53m 35s,+33°1'45"
-NGC3372,NGC 3372(船底座星雲),NGC 3372(Carina Nebula),10h 45m 8s,-59°52'4"
-NGC7293,NGC 7293(螺旋星雲),NGC 7293(Helix Nebula),22h 29m 38.5s,-20°50'13"
+Category:夏季
+M81, M81, M81, 9h 55m 33s, +69°3'55"
+M82, M82, M82, 9h 55m 52s, +69°40'47"
+M101, M101, M101, 14h 03m 12s, +54°20'57"
+NGC2403, NGC2403, NGC2403, 7h 36m 23s, +65°03'45"
+NGC2997, NGC2997, NGC2997, 10h 59m 46s, -33°07'09"
+NGC3351, NGC3351, NGC3351, 10h 42m 44s, +19°28'55"
+NGC4214, NGC4214, NGC4214, 12h 15m 39s, +36°19'55"
+NGC5128, NGC5128, NGC5128, 13h 25m 27s, -43°01'09"
+NGC6946, NGC6946, NGC6946, 20h 34m 52s, +60°09'52"
+
+Category:秋季
+M8, M8, M8, 18h 3m 37s, -24°23'12"
+NGC1893, NGC1893, NGC1893, 5h 29m 35s, +32°03'37"
+NGC1976, NGC1976, NGC1976, 5h 35m 17.3s, -5°23'28"
+NGC6334, NGC6334, NGC6334, 17h 20m 59s, -34°56'13"
+NGC6572, NGC6572, NGC6572, 18h 12m 32s, -11°47'34"
+NGC6826, NGC6826, NGC6826, 19h 44m 58s, +50°31'20"
+NGC6960, NGC6960, NGC6960, 20h 45m 24s, +30°45'25"
+NGC7380, NGC7380, NGC7380, 22h 47m 23s, +58°12'26"
+NGC3372, NGC3372, NGC3372, 10h 45m 8s, -59°52'4"
+
+Category:冬季
+M20, M20, M20, 17h 59m 1s, -23°1'0"
+M27, M27, M27, 19h 59m 36s, +22°43'16"
+M42, M42, M42, 5h 35m 17.3s, -5°23'28"
+M57, M57, M57, 18h 53m 35s, +33°1'45"
+NGC2174, NGC2174, NGC2174, 6h 12m 46s, +04°28'39"
+NGC2264, NGC2264, NGC2264, 6h 40m 40s, +09°53'47"
+NGC7293, NGC7293, NGC7293, 22h 29m 38.5s, -20°50'13"
+Orion Nebula, Orion Nebula, Orion Nebula, 5h 35m 17.3s, -5°23'28"
+Void Galaxy, Void Galaxy, Void Galaxy, 12h 30m 45s, +15°20'30"
