@@ -34,6 +34,16 @@ Click **"Generate Plot"** to display the altitude chart for your selected settin
 ### 5. Download Chart  
 Click **"Download Plot"** to save the chart as a PNG image for offline use.  
 
+### 6. Advanced Options
+- **Image Format**: Select the desired image format (PNG, JPEG, SVG) for your chart.
+- **Image Quality**: Choose the image quality level (Low, Medium, High).
+
+### 7. Dark Mode
+Toggle the **Dark Mode** button to switch between light and dark themes for better visualization.
+
+### 8. Settings
+Click **"Settings"** to adjust font sizes and other preferences.
+
 ---
 
 # SkyVault: 靜態部署的行星高度變化圖表  
@@ -71,3 +81,13 @@ Click **"Download Plot"** to save the chart as a PNG image for offline use.
 
 ### 5. 下載圖表  
 點擊 **「下載圖表」** 以 PNG 圖片格式保存圖表，便於離線使用。
+
+### 6. 高級選項
+- **圖片格式**：選擇所需的圖片格式（PNG、JPEG、SVG）。
+- **圖片質量**：選擇圖片質量等級（低、中、高）。
+
+### 7. 深色模式
+切換 **深色模式** 按鈕以在淺色和深色主題之間切換，以提升可視化效果。
+
+### 8. 設置
+點擊 **「設置」** 以調整字體大小和其他偏好設置。

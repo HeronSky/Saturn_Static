@@ -516,7 +516,7 @@
 
     <div class="settings-modal" id="settingsModal">
         <div class="settings-modal-content">
-            <span class="close-btn"ㄥ onclick="closeSettings()">&times;</span>
+            <span class="close-btn" onclick="closeSettings()">&times;</span>
             <h2 data-zh="設定" data-en="Settings">設定</h2>
             <div class="form-group">
                 <label for="font-size" data-zh="字體大小:" data-en="Font Size:">字體大小:</label>
@@ -637,754 +637,755 @@
     </div>
 
     <script>
-        let currentLanguage = 'en';  
-        let selectedBodiesSet = new Set();
-        let currentPage = 1;
-        const itemsPerPage = 9;
-        let totalPages = 1;
-        let allBodies = [];
+    let currentLanguage = 'en';  
+    let selectedBodiesSet = new Set();
+    let currentPage = 1;
+    const itemsPerPage = 9;
+    let totalPages = 1;
+    let allBodies = [];
 
-        function loadSelectedBodies() {
-            const savedSelectedBodies = localStorage.getItem('selectedBodies');
-            if (savedSelectedBodies) {
-                try {
-                    const parsed = JSON.parse(savedSelectedBodies);
-                    selectedBodiesSet = new Set(parsed);
-                } catch (e) {
-                    console.error('Error parsing selectedBodies from localStorage:', e);
-                }
+    function loadSelectedBodies() {
+        const savedSelectedBodies = localStorage.getItem('selectedBodies');
+        if (savedSelectedBodies) {
+            try {
+                const parsed = JSON.parse(savedSelectedBodies);
+                selectedBodiesSet = new Set(parsed);
+            } catch (e) {
+                console.error('Failed to parse selected bodies:', e);
+                showError(currentLanguage === 'zh' ? '無法載入選擇的天體' : 'Failed to load selected bodies');
             }
         }
+    }
 
-        async function loadBodies() {
-            try {
-                loadSelectedBodies(); 
-                const response = await fetch('bodies.txt');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const text = await response.text();
-                const lines = text.split('\n')
-                                  .map(line => line.trim())
-                                  .filter(line => line && !line.startsWith('//'));
+    async function loadBodies() {
+        try {
+            loadSelectedBodies(); 
+            const response = await fetch('bodies.txt');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const text = await response.text();
+            const lines = text.split('\n')
+                              .map(line => line.trim())
+                              .filter(line => line && !line.startsWith('//'));
 
-                let currentCategory = '';
-                allBodies = [];
-                lines.forEach(line => {
-                    if (line.startsWith('Category:')) {
-                        currentCategory = line.replace('Category:', '').trim();
-                    } else {
-                        const parts = line.split(',').map(part => part.trim());
-                        if (parts.length < 3) return; 
-                        const value = parts[0];
-                        const zh = parts[1];
-                        const en = parts[2];
-                        
-                        let bodyObj = { value, zh, en, category: currentCategory };
+            let currentCategory = '';
+            allBodies = [];
+            lines.forEach(line => {
+                if (line.startsWith('Category:')) {
+                    currentCategory = line.replace('Category:', '').trim();
+                } else {
+                    const parts = line.split(',').map(part => part.trim());
+                    if (parts.length < 3) return; 
+                    const value = parts[0];
+                    const zh = parts[1];
+                    const en = parts[2];
+                    
+                    let bodyObj = { value, zh, en, category: currentCategory };
 
-                        if (parts.length > 4) { 
-                            const raStr = parts[3];
-                            const decStr = parts[4];
-                            const rightAscension = convertRaToDecimal(raStr);
-                            const declination = convertDecToDecimal(decStr);
-                            if (rightAscension !== null && declination !== null) {
-                                bodyObj.rightAscension = rightAscension;
-                                bodyObj.declination = declination;
-                            }
+                    if (parts.length > 4) { 
+                        const raStr = parts[3];
+                        const decStr = parts[4];
+                        const rightAscension = convertRaToDecimal(raStr);
+                        const declination = convertDecToDecimal(decStr);
+                        if (rightAscension !== null && declination !== null) {
+                            bodyObj.rightAscension = rightAscension;
+                            bodyObj.declination = declination;
                         }
-                        allBodies.push(bodyObj);
                     }
-                });
+                    allBodies.push(bodyObj);
+                }
+            });
 
-                totalPages = Math.ceil(allBodies.length / itemsPerPage);
-                currentPage = 1;
+            totalPages = Math.ceil(allBodies.length / itemsPerPage);
+            currentPage = 1;
+            renderCheckboxes();
+            renderPagination();
+            updateSelectedBodiesList();
+        } catch (error) {
+            console.error('Error loading bodies.txt:', error);
+            showError(currentLanguage === 'zh' ? '無法載入天體資料' : 'Unable to load celestial bodies data');
+        }
+    }
+
+    function convertRaToDecimal(ra) {
+        const parts = ra.match(/(\d+)h\s*(\d+)m\s*(\d+(\.\d+)?)s/);
+        if (parts) {
+            const hours = parseFloat(parts[1]);
+            const minutes = parseFloat(parts[2]);
+            const seconds = parseFloat(parts[3]);
+            return hours + (minutes / 60) + (seconds / 3600);
+        }
+        return null;
+    }
+
+    function convertDecToDecimal(dec) {
+        const parts = dec.match(/([+-]?\d+)°\s*(\d+)'?\s*(\d+(\.\d+)?)"?/);
+        if (parts) {
+            const degrees = parseFloat(parts[1]);
+            const minutes = parseFloat(parts[2]);
+            const seconds = parseFloat(parts[3]);
+            return degrees + (minutes / 60) + (seconds / 3600);
+        }
+        return null;
+    }
+
+    function renderCheckboxes() {
+        const checkboxGroup = document.getElementById('checkbox-group');
+        checkboxGroup.innerHTML = '';
+
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const currentBodies = allBodies.slice(start, end);
+
+        let lastCategory = '';
+
+        currentBodies.forEach(body => {
+            if (body.category !== lastCategory) {
+                const categoryTitle = document.createElement('div');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = currentLanguage === 'zh' ? body.category : translateCategory(body.category);
+                checkboxGroup.appendChild(categoryTitle);
+                lastCategory = body.category;
+            }
+
+            const label = document.createElement('label');
+            label.style.display = 'flex';
+            label.style.alignItems = 'center';
+            label.style.justifyContent = 'center';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'body';
+            checkbox.value = body.value;
+            checkbox.setAttribute('data-zh', body.zh || body.name);
+            checkbox.setAttribute('data-en', body.en || body.name);
+            if (selectedBodiesSet.has(body.value)) {
+                checkbox.checked = true;
+            }
+
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    selectedBodiesSet.add(body.value);
+                } else {
+                    selectedBodiesSet.delete(body.value);
+                }
+                updateSelectedBodiesList();
+                localStorage.setItem('selectedBodies', JSON.stringify(Array.from(selectedBodiesSet)));
+            });
+
+            const span = document.createElement('span');
+            span.textContent = currentLanguage === 'zh' ? (body.zh || body.name) : (body.en || body.name);
+            span.setAttribute('data-zh', body.zh || body.name);
+            span.setAttribute('data-en', body.en || body.name);
+
+            label.appendChild(checkbox);
+            label.appendChild(span);
+            checkboxGroup.appendChild(label);
+        });
+    }
+
+    function renderPagination() {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        const prevButton = document.createElement('button');
+        prevButton.textContent = currentLanguage === 'zh' ? '上一頁' : 'Previous';
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
                 renderCheckboxes();
                 renderPagination();
+            }
+        };
+        pagination.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.classList.add('active');
+            }
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderCheckboxes();
+                renderPagination();
+            };
+            pagination.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement('button');
+        nextButton.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderCheckboxes();
+                renderPagination();
+            }
+        };
+        pagination.appendChild(nextButton);
+    }
+
+    function translateCategory(category) {
+        const translations = {
+            '行星': 'Planets',
+            '春季': 'Spring',
+            '夏季': 'Summer',
+            '秋季': 'Autumn',
+            '冬季': 'Winter',
+        };
+        return translations[category] || category;
+    }
+
+    function showError(message) {
+        const errorEl = document.getElementById('error');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+    }
+
+    function hideError() {
+        const errorEl = document.getElementById('error');
+        errorEl.style.display = 'none';
+    }
+
+    function updateSelectedBodiesList() {
+        const container = document.getElementById('selected-bodies');
+        container.innerHTML = '';
+        selectedBodiesSet.forEach(body => {
+            const div = document.createElement('div');
+            div.className = 'body-item';
+            div.textContent = getPlanetName(body);
+            div.onclick = () => {
+                selectedBodiesSet.delete(body);
                 updateSelectedBodiesList();
-            } catch (error) {
-                console.error('Error loading bodies.txt:', error);
-                showError(currentLanguage === 'zh' ? '無法載入天體資料' : 'Unable to load celestial bodies data');
-            }
-        }
-
-        function convertRaToDecimal(ra) {
-            const parts = ra.match(/(\d+)h\s*(\d+)m\s*(\d+(\.\d+)?)s/);
-            if (parts) {
-                const hours = parseFloat(parts[1]);
-                const minutes = parseFloat(parts[2]);
-                const seconds = parseFloat(parts[3]);
-                return hours + (minutes / 60) + (seconds / 3600);
-            }
-            return null;
-        }
-
-        function convertDecToDecimal(dec) {
-            const parts = dec.match(/([+-]?\d+)°\s*(\d+)'?\s*(\d+(\.\d+)?)"?/);
-            if (parts) {
-                const degrees = parseFloat(parts[1]);
-                const minutes = parseFloat(parts[2]);
-                const seconds = parseFloat(parts[3]);
-                return degrees + (minutes / 60) + (seconds / 3600);
-            }
-            return null;
-        }
-
-        function renderCheckboxes() {
-            const checkboxGroup = document.getElementById('checkbox-group');
-            checkboxGroup.innerHTML = '';
-
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const currentBodies = allBodies.slice(start, end);
-
-            let lastCategory = '';
-
-            currentBodies.forEach(body => {
-                if (body.category !== lastCategory) {
-                    const categoryTitle = document.createElement('div');
-                    categoryTitle.className = 'category-title';
-                    categoryTitle.textContent = currentLanguage === 'zh' ? body.category : translateCategory(body.category);
-                    checkboxGroup.appendChild(categoryTitle);
-                    lastCategory = body.category;
-                }
-
-                const label = document.createElement('label');
-                label.style.display = 'flex';
-                label.style.alignItems = 'center';
-                label.style.justifyContent = 'center';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.name = 'body';
-                checkbox.value = body.value;
-                checkbox.setAttribute('data-zh', body.zh || body.name);
-                checkbox.setAttribute('data-en', body.en || body.name);
-                if (selectedBodiesSet.has(body.value)) {
-                    checkbox.checked = true;
-                }
-
-                checkbox.addEventListener('change', () => {
-                    if (checkbox.checked) {
-                        selectedBodiesSet.add(body.value);
-                    } else {
-                        selectedBodiesSet.delete(body.value);
-                    }
-                    updateSelectedBodiesList();
-                    localStorage.setItem('selectedBodies', JSON.stringify(Array.from(selectedBodiesSet)));
-                });
-
-                const span = document.createElement('span');
-                span.textContent = currentLanguage === 'zh' ? (body.zh || body.name) : (body.en || body.name);
-                span.setAttribute('data-zh', body.zh || body.name);
-                span.setAttribute('data-en', body.en || body.name);
-
-                label.appendChild(checkbox);
-                label.appendChild(span);
-                checkboxGroup.appendChild(label);
-            });
-        }
-
-        function renderPagination() {
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
-
-            if (totalPages <= 1) return;
-
-            const prevButton = document.createElement('button');
-            prevButton.textContent = currentLanguage === 'zh' ? '上一頁' : 'Previous';
-            prevButton.disabled = currentPage === 1;
-            prevButton.onclick = () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    renderCheckboxes();
-                    renderPagination();
-                }
+                const checkbox = document.querySelector(`input[value="${body}"]`);
+                if (checkbox) checkbox.checked = false;
+                localStorage.setItem('selectedBodies', JSON.stringify(Array.from(selectedBodiesSet)));
             };
-            pagination.appendChild(prevButton);
+            container.appendChild(div);
+        });
+    }
 
-            for (let i = 1; i <= totalPages; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.textContent = i;
-                if (i === currentPage) {
-                    pageButton.classList.add('active');
-                }
-                pageButton.onclick = () => {
-                    currentPage = i;
-                    renderCheckboxes();
-                    renderPagination();
-                };
-                pagination.appendChild(pageButton);
-            }
+    function getPlanetName(bodyValue, lang = currentLanguage) {
+        const body = allBodies.find(b => b.value === bodyValue);
+        if (!body) return bodyValue;
+        return lang === 'zh' ? (body.zh || body.name) : (body.en || body.name);
+    }
 
-            const nextButton = document.createElement('button');
-            nextButton.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
-            nextButton.disabled = currentPage === totalPages;
-            nextButton.onclick = () => {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    renderCheckboxes();
-                    renderPagination();
-                }
-            };
-            pagination.appendChild(nextButton);
+    async function generateChart() {
+        const errorEl = document.getElementById('error');
+        const resultEl = document.getElementById('result');
+        const loadingEl = document.getElementById('loading');
+        const downloadBtn = document.getElementById('download-btn');
+        errorEl.style.display = 'none';
+        resultEl.innerHTML = '';
+        loadingEl.style.display = 'block';
+        downloadBtn.style.display = 'none';
+
+        const selectedBodies = Array.from(selectedBodiesSet);
+        const hours = parseFloat(document.getElementById('hours').value);
+        const startTime = document.getElementById('start-time').value;
+        const longitude = parseFloat(document.getElementById('longitude').value);
+        const latitude = parseFloat(document.getElementById('latitude').value);
+        const imageFormat = document.getElementById('image-format').value;
+        const imageQualitySelection = document.getElementById('image-quality').value;
+
+        if (selectedBodies.length === 0) {
+            loadingEl.style.display = 'none';
+            showError(currentLanguage === 'zh' ? '請至少選擇一個天體' : 'Please select at least one celestial body');
+            return;
         }
 
-        function translateCategory(category) {
-            const translations = {
-                '行星': 'Planets',
-                '春季': 'Spring',
-                '夏季': 'Summer',
-                '秋季': 'Autumn',
-                '冬季': 'Winter',
-            };
-            return translations[category] || category;
+        if (isNaN(latitude) || isNaN(longitude)) {
+            loadingEl.style.display = 'none';
+            showError(currentLanguage === 'zh' ? '請輸入有效的緯度和經度' : 'Please enter valid latitude and longitude');
+            return;
         }
 
-        function showError(message) {
-            const errorEl = document.getElementById('error');
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
+        if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+            loadingEl.style.display = 'none';
+            showError(currentLanguage === 'zh' ? '請輸入有效的緯度（-90 至 90）和經度（-180 至 180）' : 'Please enter valid latitude (-90 to 90) and longitude (-180 to 180)');
+            return;
         }
 
-        function hideError() {
-            const errorEl = document.getElementById('error');
-            errorEl.style.display = 'none';
-        }
+        try {
+            const astro = Astronomy;
+            const observer = new astro.Observer(latitude, longitude, 0);
 
-        function updateSelectedBodiesList() {
-            const container = document.getElementById('selected-bodies');
-            container.innerHTML = '';
-            selectedBodiesSet.forEach(body => {
-                const div = document.createElement('div');
-                div.className = 'body-item';
-                div.textContent = getPlanetName(body);
-                div.onclick = () => {
-                    selectedBodiesSet.delete(body);
-                    updateSelectedBodiesList();
-                    const checkbox = document.querySelector(`input[value="${body}"]`);
-                    if (checkbox) checkbox.checked = false;
-                    localStorage.setItem('selectedBodies', JSON.stringify(Array.from(selectedBodiesSet)));
-                };
-                container.appendChild(div);
-            });
-        }
-
-        function getPlanetName(bodyValue, lang = currentLanguage) {
-            const body = allBodies.find(b => b.value === bodyValue);
-            if (!body) return bodyValue;
-            return lang === 'zh' ? (body.zh || body.name) : (body.en || body.name);
-        }
-
-        async function generateChart() {
-            const errorEl = document.getElementById('error');
-            const resultEl = document.getElementById('result');
-            const loadingEl = document.getElementById('loading');
-            const downloadBtn = document.getElementById('download-btn');
-            errorEl.style.display = 'none';
-            resultEl.innerHTML = '';
-            loadingEl.style.display = 'block';
-            downloadBtn.style.display = 'none';
-
-            const selectedBodies = Array.from(selectedBodiesSet);
-            const hours = parseFloat(document.getElementById('hours').value);
-            const startTime = document.getElementById('start-time').value;
-            const longitude = parseFloat(document.getElementById('longitude').value);
-            const latitude = parseFloat(document.getElementById('latitude').value);
-            const imageFormat = document.getElementById('image-format').value;
-            const imageQualitySelection = document.getElementById('image-quality').value;
-
-            if (selectedBodies.length === 0) {
+            const startDate = new Date(startTime);
+            if (isNaN(startDate)) {
                 loadingEl.style.display = 'none';
-                showError(currentLanguage === 'zh' ? '請至少選擇一個天體' : 'Please select at least one celestial body');
+                showError(currentLanguage === 'zh' ? '請輸入有效的開始時間' : 'Please enter a valid start time');
                 return;
             }
 
-            if (isNaN(latitude) || isNaN(longitude)) {
-                loadingEl.style.display = 'none';
-                showError(currentLanguage === 'zh' ? '請輸入有效的緯度和經度' : 'Please enter valid latitude and longitude');
-                return;
+            const deltaHours = hours;
+            const timeArray = [];
+            const totalMilliseconds = deltaHours * 60 * 60 * 1000;
+            const step = totalMilliseconds / 100; // 每1%時間範圍的間隔
+
+            for (let i = 0; i <= 100; i++) {
+                let dt = new Date(startDate.getTime() + (i * step));
+                timeArray.push(dt);
             }
 
-            if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-                loadingEl.style.display = 'none';
-                showError(currentLanguage === 'zh' ? '請輸入有效的緯度（-90 至 90）和經度（-180 至 180）' : 'Please enter valid latitude (-90 to 90) and longitude (-180 to 180)');
-                return;
-            }
+            const traces = [];
 
-            try {
-                const astro = Astronomy;
-                const observer = new astro.Observer(latitude, longitude, 0);
-
-                const startDate = new Date(startTime);
-                if (isNaN(startDate)) {
-                    loadingEl.style.display = 'none';
-                    showError(currentLanguage === 'zh' ? '請輸入有效的開始時間' : 'Please enter a valid start time');
+            for (let bodyName of selectedBodies) {
+                const bodyData = allBodies.find(b => b.value === bodyName);
+                if (!bodyData) {
+                    showError(currentLanguage === 'zh' ? `無法找到天體：${bodyName}` : `Unable to find celestial body: ${bodyName}`);
                     return;
                 }
 
-                const deltaHours = hours;
-                const timeArray = [];
-                const totalMilliseconds = deltaHours * 60 * 60 * 1000;
-                const step = totalMilliseconds / 100; // 每1%時間範圍的間隔
-
-                for (let i = 0; i <= 100; i++) {
-                    let dt = new Date(startDate.getTime() + (i * step));
-                    timeArray.push(dt);
-                }
-
-                const traces = [];
-
-                for (let bodyName of selectedBodies) {
-                    const bodyData = allBodies.find(b => b.value === bodyName);
-                    if (!bodyData) {
-                        showError(currentLanguage === 'zh' ? `無法找到天體：${bodyName}` : `Unable to find celestial body: ${bodyName}`);
+                const altitudes = [];
+                const times = [];
+                for (let dt of timeArray) {
+                    let jd = astro.MakeTime(dt);
+                    let horizontal;
+                    if (astro.Body[bodyName]) {
+                        const equCoords = astro.Equator(bodyName, jd, observer, true, true);
+                        horizontal = astro.Horizon(jd, observer, equCoords.ra, equCoords.dec, 'normal');
+                    } else if (bodyData.rightAscension !== undefined && bodyData.declination !== undefined) {
+                        const ra = bodyData.rightAscension;
+                        const dec = bodyData.declination;
+                        horizontal = astro.Horizon(jd, observer, ra, dec, 'normal');
+                    } else {
+                        showError(currentLanguage === 'zh' ? `天體資料不完整：${bodyName}` : `Incomplete data for celestial body: ${bodyName}`);
                         return;
                     }
 
-                    const altitudes = [];
-                    const times = [];
-                    for (let dt of timeArray) {
-                        let jd = astro.MakeTime(dt);
-                        let horizontal;
-                        if (astro.Body[bodyName]) {
-                            const equCoords = astro.Equator(bodyName, jd, observer, true, true);
-                            horizontal = astro.Horizon(jd, observer, equCoords.ra, equCoords.dec, 'normal');
-                        } else if (bodyData.rightAscension !== undefined && bodyData.declination !== undefined) {
-                            const ra = bodyData.rightAscension;
-                            const dec = bodyData.declination;
-                            horizontal = astro.Horizon(jd, observer, ra, dec, 'normal');
-                        } else {
-                            showError(currentLanguage === 'zh' ? `天體資料不完整：${bodyName}` : `Incomplete data for celestial body: ${bodyName}`);
-                            return;
-                        }
-
-                        if (horizontal) {
-                            altitudes.push(horizontal.altitude);
-                            times.push(dt);
-                        } else {
-                            altitudes.push(null);
-                            times.push(dt);
-                        }
+                    if (horizontal) {
+                        altitudes.push(horizontal.altitude);
+                        times.push(dt);
+                    } else {
+                        altitudes.push(null);
+                        times.push(dt);
                     }
-
-                    traces.push({
-                        x: times,
-                        y: altitudes,
-                        mode: 'lines',
-                        name: getPlanetName(bodyName),
-                        line: { shape: 'spline' } // 添加平滑曲線
-                    });
                 }
 
-                const layout = {
-                    showlegend: true,
-                    xaxis: {
-                        title: currentLanguage === 'zh' ? '當地時間' : 'Local Time',
-                        tickformat: '%H:%M',
-                        nticks: Math.min(12, deltaHours + 1)
-                    },
-                    yaxis: {
-                        title: currentLanguage === 'zh' ? '高度 (度)' : 'Altitude (degrees)'
-                    }
+                traces.push({
+                    x: times,
+                    y: altitudes,
+                    mode: 'lines',
+                    name: getPlanetName(bodyName),
+                    line: { shape: 'spline' } // 添加平滑曲線
+                });
+            }
+
+            const layout = {
+                showlegend: true,
+                xaxis: {
+                    title: currentLanguage === 'zh' ? '當地時間' : 'Local Time',
+                    tickformat: '%H:%M',
+                    nticks: Math.min(12, deltaHours + 1)
+                },
+                yaxis: {
+                    title: currentLanguage === 'zh' ? '高度 (度)' : 'Altitude (degrees)'
+                }
+            };
+
+            Plotly.newPlot(resultEl, traces, layout).then(function(gd) {
+                let imageQuality;
+                switch(imageQualitySelection) {
+                    case 'low':
+                        imageQuality = 0.5;
+                        break;
+                    case 'medium':
+                        imageQuality = 0.75;
+                        break;
+                    case 'high':
+                        imageQuality = 1;
+                        break;
+                    default:
+                        imageQuality = 1;
+                }
+
+                let toImageOptions = {
+                    format: imageFormat,
+                    width: 1280,
+                    height: 720,
+                    scale: imageQuality
                 };
 
-                Plotly.newPlot(resultEl, traces, layout).then(function(gd) {
-                    let imageQuality;
-                    switch(imageQualitySelection) {
-                        case 'low':
-                            imageQuality = 0.5;
-                            break;
-                        case 'medium':
-                            imageQuality = 0.75;
-                            break;
-                        case 'high':
-                            imageQuality = 1;
-                            break;
-                        default:
-                            imageQuality = 1;
-                    }
+                Plotly.toImage(gd, toImageOptions).then(function(dataUrl) {
+                    Plotly.purge(resultEl);
+                    const img = new Image();
+                    img.src = dataUrl;
+                    img.alt = currentLanguage === 'zh' ? '天體高度變化圖表' : 'Celestial Bodies Altitude Chart';
+                    img.style.maxWidth = '100%';
+                    resultEl.appendChild(img);
 
-                    let toImageOptions = {
-                        format: imageFormat,
-                        width: 1280,
-                        height: 720,
-                        scale: imageQuality
-                    };
-
-                    Plotly.toImage(gd, toImageOptions).then(function(dataUrl) {
-                        Plotly.purge(resultEl);
-                        const img = new Image();
-                        img.src = dataUrl;
-                        img.alt = currentLanguage === 'zh' ? '天體高度變化圖表' : 'Celestial Bodies Altitude Chart';
-                        img.style.maxWidth = '100%';
-                        resultEl.appendChild(img);
-
-                        loadingEl.style.display = 'none';
-                        downloadBtn.style.display = 'block';
-                        downloadBtn.onclick = function() {
-                            const link = document.createElement('a');
-                            link.href = img.src;
-                            link.download = 'chart.' + imageFormat;
-                            link.click();
-                        };
-                    }).catch(function(error) {
-                        console.error('生成圖像時出錯:', error);
-                        loadingEl.style.display = 'none';
-                        showError(currentLanguage === 'zh' ? '生成圖像時出錯' : 'Error generating image');
-                    });
-                }).catch(function(error) {
-                    console.error('生成圖表時出錯:', error);
                     loadingEl.style.display = 'none';
-                    showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
+                    downloadBtn.style.display = 'block';
+                    downloadBtn.onclick = function() {
+                        const link = document.createElement('a');
+                        link.href = img.src;
+                        link.download = 'chart.' + imageFormat;
+                        link.click();
+                    };
+                }).catch(function(error) {
+                    console.error('生成圖像時出錯:', error);
+                    loadingEl.style.display = 'none';
+                    showError(currentLanguage === 'zh' ? '生成圖像時出錯' : 'Error generating image');
                 });
-            } catch (error) {
+            }).catch(function(error) {
                 console.error('生成圖表時出錯:', error);
                 loadingEl.style.display = 'none';
                 showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
-            }
-        }
-
-        function getCurrentLocation() {
-            const latInput = document.getElementById('latitude');
-            const lonInput = document.getElementById('longitude');
-            const errorEl = document.getElementById('error');
-
-            errorEl.style.display = 'none';
-            errorEl.textContent = '';
-
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    latInput.value = position.coords.latitude.toFixed(4);
-                    lonInput.value = position.coords.longitude.toFixed(4);
-                },
-                function(error) {
-                    let errorMessage = currentLanguage === 'zh' ? '無法獲取位置：' : 'Unable to get location: ';
-                    switch(error.code) {
-                        case 1: 
-                            errorMessage += currentLanguage === 'zh' ? '用戶拒絕定位請求' : 'User denied location request';
-                            break;
-                        case 2: 
-                            errorMessage += currentLanguage === 'zh' ? '位置資訊不可用' : 'Location information unavailable';
-                            break;
-                        case 3: 
-                            errorMessage += currentLanguage === 'zh' ? '定位請求超時' : 'Location request timed out';
-                            break;
-                        default:
-                            errorMessage += currentLanguage === 'zh' ? '未知錯誤' : 'Unknown error';
-                    }
-
-                    errorEl.textContent = errorMessage;
-                    errorEl.style.display = 'block';
-                }
-            );
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            if(document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-            } else {
-                localStorage.setItem('theme', 'light');
-            }
-            updateDarkModeButtonText();
-            renderCheckboxes();
-            renderPagination();
-            updateSelectedBodiesList();
-        }
-
-        function updateDarkModeButtonText() {
-            const toggleButton = document.getElementById('toggle-dark-mode');
-            toggleButton.textContent = document.body.classList.contains('dark-mode') ? 
-                (currentLanguage === 'zh' ? '淺色模式' : 'Light Mode') : 
-                (currentLanguage === 'zh' ? '深色模式' : 'Dark Mode');
-        }
-
-        function downloadImage() {
-            const img = document.querySelector('#result img');
-            if (img) {
-                const link = document.createElement('a');
-                link.href = img.src;
-                link.download = 'chart.' + img.src.split('.').pop().split('?')[0];
-                link.click();
-            }
-        }
-
-        function openTutorial() {
-            const modal = document.getElementById('tutorialModal');
-            modal.classList.add('active');
-        }
-
-        function closeTutorial() {
-            const modal = document.getElementById('tutorialModal');
-            modal.classList.remove('active');
-            currentStep = 1;
-            updateTutorialSteps();
-            updateButtons();
-        }
-
-        function selectLanguage(lang) {
-            currentLanguage = lang;
-            const elements = document.querySelectorAll('[data-zh][data-en]');
-            elements.forEach(el => {
-                if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea') {
-                    el.placeholder = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
-                } else {
-                    el.textContent = lang === 'zh' ? (el.getAttribute('data-zh') || el.textContent) : (el.getAttribute('data-en') || el.textContent);
-                }
             });
-
-            const langModal = document.getElementById('languageModal');
-            langModal.classList.remove('active');
-
-            renderCheckboxes();
-            renderPagination();
-            updateSelectedBodiesList();
-            updateTutorialSteps();
-            openTutorial(); 
+        } catch (error) {
+            console.error('生成圖表時出錯:', error);
+            loadingEl.style.display = 'none';
+            showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
         }
+    }
 
-        function applyColorScheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if(savedTheme === 'dark'){
+    function getCurrentLocation() {
+        const latInput = document.getElementById('latitude');
+        const lonInput = document.getElementById('longitude');
+        const errorEl = document.getElementById('error');
+
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                latInput.value = position.coords.latitude.toFixed(4);
+                lonInput.value = position.coords.longitude.toFixed(4);
+            },
+            function(error) {
+                let errorMessage = currentLanguage === 'zh' ? '無法獲取位置：' : 'Unable to get location: ';
+                switch(error.code) {
+                    case 1: 
+                        errorMessage += currentLanguage === 'zh' ? '用戶拒絕定位請求' : 'User denied location request';
+                        break;
+                    case 2: 
+                        errorMessage += currentLanguage === 'zh' ? '位置資訊不可用' : 'Location information unavailable';
+                        break;
+                    case 3: 
+                        errorMessage += currentLanguage === 'zh' ? '定位請求超時' : 'Location request timed out';
+                        break;
+                    default:
+                        errorMessage += currentLanguage === 'zh' ? '未知錯誤' : 'Unknown error';
+                }
+
+                errorEl.textContent = errorMessage;
+                errorEl.style.display = 'block';
+            }
+        );
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        if(document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
+        }
+        updateDarkModeButtonText();
+        renderCheckboxes();
+        renderPagination();
+        updateSelectedBodiesList();
+    }
+
+    function updateDarkModeButtonText() {
+        const toggleButton = document.getElementById('toggle-dark-mode');
+        toggleButton.textContent = document.body.classList.contains('dark-mode') ? 
+            (currentLanguage === 'zh' ? '淺色模式' : 'Light Mode') : 
+            (currentLanguage === 'zh' ? '深色模式' : 'Dark Mode');
+    }
+
+    function downloadImage() {
+        const img = document.querySelector('#result img');
+        if (img) {
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'chart.' + img.src.split('.').pop().split('?')[0];
+            link.click();
+        }
+    }
+
+    function openTutorial() {
+        const modal = document.getElementById('tutorialModal');
+        modal.classList.add('active');
+    }
+
+    function closeTutorial() {
+        const modal = document.getElementById('tutorialModal');
+        modal.classList.remove('active');
+        currentStep = 1;
+        updateTutorialSteps();
+        updateButtons();
+    }
+
+    function selectLanguage(lang) {
+        currentLanguage = lang;
+        const elements = document.querySelectorAll('[data-zh][data-en]');
+        elements.forEach(el => {
+            if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea') {
+                el.placeholder = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
+            } else {
+                el.textContent = lang === 'zh' ? (el.getAttribute('data-zh') || el.textContent) : (el.getAttribute('data-en') || el.textContent);
+            }
+        });
+
+        const langModal = document.getElementById('languageModal');
+        langModal.classList.remove('active');
+
+        renderCheckboxes();
+        renderPagination();
+        updateSelectedBodiesList();
+        updateTutorialSteps();
+        openTutorial(); 
+    }
+
+    function applyColorScheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if(savedTheme === 'dark'){
+            document.body.classList.add('dark-mode');
+        } else if(savedTheme === 'light'){
+            document.body.classList.remove('dark-mode');
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.body.classList.add('dark-mode');
-            } else if(savedTheme === 'light'){
+            } else {
                 document.body.classList.remove('dark-mode');
-            } else {
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.body.classList.add('dark-mode');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                }
             }
-            updateDarkModeButtonText();
         }
+        updateDarkModeButtonText();
+    }
 
-        // 新增保存字體大小的函數
-        function saveFontSize() {
-            const fontSize = document.getElementById('font-size').value;
-            if (fontSize === 'small') {
+    // 新增保存字體大小的函數
+    function saveFontSize() {
+        const fontSize = document.getElementById('font-size').value;
+        if (fontSize === 'small') {
+            document.body.style.fontSize = '14px';
+        } else if (fontSize === 'medium') {
+            document.body.style.fontSize = '16px';
+        } else if (fontSize === 'large') {
+            document.body.style.fontSize = '18px';
+        }
+        localStorage.setItem('fontSize', fontSize);
+    }
+
+    // 新增保存語言的函數
+    function saveLanguage() {
+        const language = document.getElementById('language-select').value;
+        localStorage.setItem('language', language);
+        currentLanguage = language;
+        applyLanguage();
+    }
+
+    // 更新事件監聽器，分離字體大小和語言的保存
+    document.getElementById('font-size').removeEventListener('change', saveSettings);
+    document.getElementById('font-size').addEventListener('change', saveFontSize);
+
+    document.getElementById('language-select').removeEventListener('change', saveSettings);
+    document.getElementById('language-select').addEventListener('change', saveLanguage);
+
+    function saveSettings() {
+        const fontSize = document.getElementById('font-size').value;
+        if (fontSize === 'small') {
+            document.body.style.fontSize = '14px';
+        } else if (fontSize === 'medium') {
+            document.body.style.fontSize = '16px';
+        } else if (fontSize === 'large') {
+            document.body.style.fontSize = '18px';
+        }
+        localStorage.setItem('fontSize', fontSize);
+
+        const language = document.getElementById('language-select').value;
+        localStorage.setItem('language', language);
+        currentLanguage = language;
+        applyLanguage();
+    }
+
+    function loadSettings() {
+        const savedFontSize = localStorage.getItem('fontSize');
+        if (savedFontSize) {
+            document.getElementById('font-size').value = savedFontSize;
+            if (savedFontSize === 'small') {
                 document.body.style.fontSize = '14px';
-            } else if (fontSize === 'medium') {
+            } else if (savedFontSize === 'medium') {
                 document.body.style.fontSize = '16px';
-            } else if (fontSize === 'large') {
+            } else if (savedFontSize === 'large') {
                 document.body.style.fontSize = '18px';
             }
-            localStorage.setItem('fontSize', fontSize);
         }
-
-        // 新增保存語言的函數
-        function saveLanguage() {
-            const language = document.getElementById('language-select').value;
-            localStorage.setItem('language', language);
-            currentLanguage = language;
-            applyLanguage();
+        const savedLanguage = localStorage.getItem('language');
+        if (savedLanguage) {
+            currentLanguage = savedLanguage;
+            document.getElementById('language-select').value = savedLanguage;
+        } else {
+            document.getElementById('language-select').value = currentLanguage;
         }
+    }
 
-        // 更新事件監聽器，分離字體大小和語言的保存
-        document.getElementById('font-size').removeEventListener('change', saveSettings);
-        document.getElementById('font-size').addEventListener('change', saveFontSize);
+    function applyLanguage() {
+        const elements = document.querySelectorAll('[data-zh][data-en]');
+        elements.forEach(el => {
+            el.textContent = el.getAttribute(`data-${currentLanguage}`);
+        });
+        updateDarkModeButtonText();
+    }
 
-        document.getElementById('language-select').removeEventListener('change', saveSettings);
-        document.getElementById('language-select').addEventListener('change', saveLanguage);
+    document.getElementById('confirm-settings-btn').addEventListener('click', () => {
+        saveSettings();
+        closeSettings();
+    });
 
-        function saveSettings() {
-            const fontSize = document.getElementById('font-size').value;
-            if (fontSize === 'small') {
-                document.body.style.fontSize = '14px';
-            } else if (fontSize === 'medium') {
-                document.body.style.fontSize = '16px';
-            } else if (fontSize === 'large') {
-                document.body.style.fontSize = '18px';
-            }
-            localStorage.setItem('fontSize', fontSize);
+    function openSettings() {
+        document.getElementById('settingsModal').classList.add('active');
+    }
 
-            const language = document.getElementById('language-select').value;
-            localStorage.setItem('language', language);
-            currentLanguage = language;
-            applyLanguage();
-        }
+    function closeSettings() {
+        document.getElementById('settingsModal').classList.remove('active');
+    }
 
-        function loadSettings() {
-            const savedFontSize = localStorage.getItem('fontSize');
-            if (savedFontSize) {
-                document.getElementById('font-size').value = savedFontSize;
-                if (savedFontSize === 'small') {
-                    document.body.style.fontSize = '14px';
-                } else if (savedFontSize === 'medium') {
-                    document.body.style.fontSize = '16px';
-                } else if (savedFontSize === 'large') {
-                    document.body.style.fontSize = '18px';
-                }
-            }
-            const savedLanguage = localStorage.getItem('language');
-            if (savedLanguage) {
-                currentLanguage = savedLanguage;
-                document.getElementById('language-select').value = savedLanguage;
+    window.onload = async function() {
+        const languageModal = document.getElementById('languageModal');
+        languageModal.classList.add('active');
+
+        await loadBodies();
+        applyColorScheme();
+        renderCheckboxes();
+        renderPagination();
+        updateSelectedBodiesList();
+        updateTutorialSteps();
+        updateButtons();
+
+        const startTimeInput = document.getElementById('start-time');
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+        startTimeInput.value = localDateTime;
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (e.matches) {
+                document.body.classList.add('dark-mode');
             } else {
-                document.getElementById('language-select').value = currentLanguage;
+                document.body.classList.remove('dark-mode');
             }
-        }
-
-        function applyLanguage() {
-            const elements = document.querySelectorAll('[data-zh][data-en]');
-            elements.forEach(el => {
-                el.textContent = el.getAttribute(`data-${currentLanguage}`);
-            });
             updateDarkModeButtonText();
-        }
+            renderCheckboxes();
+            renderPagination();
+            updateSelectedBodiesList();
+        });
 
-        document.getElementById('confirm-settings-btn').addEventListener('click', () => {
-            saveSettings();
+        const toggleDarkModeBtn = document.getElementById('toggle-dark-mode');
+        toggleDarkModeBtn.removeAttribute('onclick');
+        toggleDarkModeBtn.addEventListener('click', toggleDarkMode);
+
+        const openTutorialBtn = document.getElementById('open-tutorial-btn');
+        openTutorialBtn.removeAttribute('onclick');
+        openTutorialBtn.addEventListener('click', openTutorial);
+
+        const githubProjectBtn = document.getElementById('github-project-btn');
+        githubProjectBtn.removeAttribute('onclick');
+        githubProjectBtn.addEventListener('click', function() {
+            window.open('https://github.com/HeronSky/Saturn_Static', '_blank');
+        });
+
+        const generateBtn = document.getElementById('generate-btn');
+        generateBtn.removeAttribute('onclick');
+        generateBtn.addEventListener('click', generateChart);
+
+        const downloadBtn = document.getElementById('download-btn');
+        downloadBtn.removeAttribute('onclick');
+        downloadBtn.addEventListener('click', downloadImage);
+
+        const locationBtnFinal = document.getElementById('location-btn');
+        locationBtnFinal.removeAttribute('onclick');
+        locationBtnFinal.addEventListener('click', getCurrentLocation);
+
+        const settingsBtn = document.getElementById('settings-btn');
+        settingsBtn.addEventListener('click', openSettings);
+
+        const confirmSettingsBtn = document.getElementById('confirm-settings-btn');
+        confirmSettingsBtn.addEventListener('click', () => {
+            const selectedLanguage = document.getElementById('language-select').value;
+            selectLanguage(selectedLanguage);
             closeSettings();
         });
 
-        function openSettings() {
-            document.getElementById('settingsModal').classList.add('active');
-        }
+        const fontSizeSelect = document.getElementById('font-size');
+        fontSizeSelect.addEventListener('change', saveFontSize);
 
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('active');
-        }
+        const languageSelect = document.getElementById('language-select');
+        languageSelect.addEventListener('change', saveLanguage);
 
-        window.onload = async function() {
-            const languageModal = document.getElementById('languageModal');
-            languageModal.classList.add('active');
+        loadSettings();
+    };
 
-            await loadBodies();
-            applyColorScheme();
-            renderCheckboxes();
-            renderPagination();
-            updateSelectedBodiesList();
-            updateTutorialSteps();
+    let currentStep = 1;
+
+    function nextTutorialStep() {
+        const steps = document.querySelectorAll('.tutorial-step');
+        if (currentStep < steps.length) {
+            steps[currentStep - 1].style.display = 'none';
+            currentStep++;
+            steps[currentStep - 1].style.display = 'block';
             updateButtons();
 
-            const startTimeInput = document.getElementById('start-time');
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-            startTimeInput.value = localDateTime;
-
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                if (e.matches) {
-                    document.body.classList.add('dark-mode');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                }
-                updateDarkModeButtonText();
-                renderCheckboxes();
-                renderPagination();
-                updateSelectedBodiesList();
-            });
-
-            const toggleDarkModeBtn = document.getElementById('toggle-dark-mode');
-            toggleDarkModeBtn.removeAttribute('onclick');
-            toggleDarkModeBtn.addEventListener('click', toggleDarkMode);
-
-            const openTutorialBtn = document.getElementById('open-tutorial-btn');
-            openTutorialBtn.removeAttribute('onclick');
-            openTutorialBtn.addEventListener('click', openTutorial);
-
-            const githubProjectBtn = document.getElementById('github-project-btn');
-            githubProjectBtn.removeAttribute('onclick');
-            githubProjectBtn.addEventListener('click', function() {
-                window.open('https://github.com/HeronSky/Saturn_Static', '_blank');
-            });
-
-            const generateBtn = document.getElementById('generate-btn');
-            generateBtn.removeAttribute('onclick');
-            generateBtn.addEventListener('click', generateChart);
-
-            const downloadBtn = document.getElementById('download-btn');
-            downloadBtn.removeAttribute('onclick');
-            downloadBtn.addEventListener('click', downloadImage);
-
-            const locationBtnFinal = document.getElementById('location-btn');
-            locationBtnFinal.removeAttribute('onclick');
-            locationBtnFinal.addEventListener('click', getCurrentLocation);
-
-            const settingsBtn = document.getElementById('settings-btn');
-            settingsBtn.addEventListener('click', openSettings);
-
-            const confirmSettingsBtn = document.getElementById('confirm-settings-btn');
-            confirmSettingsBtn.addEventListener('click', () => {
-                const selectedLanguage = document.getElementById('language-select').value;
-                selectLanguage(selectedLanguage);
-                closeSettings();
-            });
-
-            const fontSizeSelect = document.getElementById('font-size');
-            fontSizeSelect.addEventListener('change', saveFontSize);
-
-            const languageSelect = document.getElementById('language-select');
-            languageSelect.addEventListener('change', saveLanguage);
-
-            loadSettings();
-        };
-
-        let currentStep = 1;
-
-        function nextTutorialStep() {
-            const steps = document.querySelectorAll('.tutorial-step');
-            if (currentStep < steps.length) {
-                steps[currentStep - 1].style.display = 'none';
-                currentStep++;
-                steps[currentStep - 1].style.display = 'block';
-                updateButtons();
-
-                if (currentStep === steps.length) {
-                    document.getElementById('nextStep').textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
-                }
-            } else if (currentStep === steps.length) {
-                closeTutorial();
-                currentStep = 1;
-                updateButtons();
-                document.getElementById('nextStep').textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
-            }
-        }
-
-        function prevTutorialStep() {
-            const steps = document.querySelectorAll('.tutorial-step');
-            if (currentStep > 1) {
-                steps[currentStep - 1].style.display = 'none';
-                currentStep--;
-                steps[currentStep - 1].style.display = 'block';
-                updateButtons();
-            }
-        }
-
-        function updateButtons() {
-            const steps = document.querySelectorAll('.tutorial-step');
-            const prevBtn = document.getElementById('prevStep');
-            const nextBtn = document.getElementById('nextStep');
-            prevBtn.disabled = currentStep === 1;
-
             if (currentStep === steps.length) {
-                nextBtn.textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
-            } else {
-                nextBtn.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
+                document.getElementById('nextStep').textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
             }
+        } else if (currentStep === steps.length) {
+            closeTutorial();
+            currentStep = 1;
+            updateButtons();
+            document.getElementById('nextStep').textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
+        }
+    }
+
+    function prevTutorialStep() {
+        const steps = document.querySelectorAll('.tutorial-step');
+        if (currentStep > 1) {
+            steps[currentStep - 1].style.display = 'none';
+            currentStep--;
+            steps[currentStep - 1].style.display = 'block';
+            updateButtons();
+        }
+    }
+
+    function updateButtons() {
+        const steps = document.querySelectorAll('.tutorial-step');
+        const prevBtn = document.getElementById('prevStep');
+        const nextBtn = document.getElementById('nextStep');
+        prevBtn.disabled = currentStep === 1;
+
+        if (currentStep === steps.length) {
+            nextBtn.textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
+        } else {
+            nextBtn.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
+        }
+    }
+
+    function updateTutorialSteps() {
+        const steps = document.querySelectorAll('.tutorial-step');
+        steps.forEach((step, index) => {
+            step.style.display = index === (currentStep - 1) ? 'block' : 'none';
+        });
+
+        const nextBtn = document.getElementById('nextStep');
+        if (currentStep === steps.length) {
+            nextBtn.textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
+        } else {
+            nextBtn.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
         }
 
-        function updateTutorialSteps() {
-            const steps = document.querySelectorAll('.tutorial-step');
-            steps.forEach((step, index) => {
-                step.style.display = index === (currentStep - 1) ? 'block' : 'none';
-            });
-
-            const nextBtn = document.getElementById('nextStep');
-            if (currentStep === steps.length) {
-                nextBtn.textContent = currentLanguage === 'zh' ? '完成' : 'Finish';
-            } else {
-                nextBtn.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
-            }
-
-            const prevBtn = document.getElementById('prevStep');
-            prevBtn.disabled = currentStep === 1;
-        }
-    </script>
+        const prevBtn = document.getElementById('prevStep');
+        prevBtn.disabled = currentStep === 1;
+    }
+</script>
 </body>
 </html>
