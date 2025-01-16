@@ -1,4 +1,4 @@
-Category:行星
+Category:太陽系
 Sun,太陽,Sun
 Mercury,水星,Mercury
 Venus,金星,Venus

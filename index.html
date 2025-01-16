@@ -533,6 +533,22 @@
                     <option value="en" data-zh="English" data-en="English" selected>English</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="image-format" data-zh="圖片格式：" data-en="Image Format:">圖片格式：</label>
+                <select id="image-format" name="image-format">
+                    <option value="png" data-zh="PNG" data-en="PNG">PNG</option>
+                    <option value="jpeg" data-zh="JPEG" data-en="JPEG">JPEG</option>
+                    <option value="svg" data-zh="SVG" data-en="SVG">SVG</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="image-quality" data-zh="圖片品質：" data-en="Image Quality:">圖片品質：</label>
+                <select id="image-quality" name="image-quality">
+                    <option value="low" data-zh="低" data-en="Low">低</option>
+                    <option value="medium" data-zh="中" data-en="Medium" selected>中</option>
+                    <option value="high" data-zh="高" data-en="High">高</option>
+                </select>
+            </div>
             <button id="confirm-settings-btn" data-zh="確定" data-en="Confirm">確定</button>
         </div>
     </div>
@@ -587,14 +603,21 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="hours" data-zh="時間範圍（小時）:" data-en="Time Range (Hours):">時間範圍（小時）:</label>
-            <input type="number" id="hours" name="hours" min="1" max="24" value="8" data-zh="時間範圍（小時）" data-en="Time Range (Hours)">
-        </div>
-
-        <div class="form-group">
-            <label for="start-time" data-zh="開始時間:" data-en="Start Time:">開始時間:</label>
-            <input type="datetime-local" id="start-time" name="start-time" required data-zh="開始時間" data-en="Start Time">
+        <div class="form-group flex-row">
+            <div>
+                <label for="hours" data-zh="時間範圍（小時）:" data-en="Time Range (Hours):">時間範圍（小時）:</label>
+                <input type="number" id="hours" name="hours" min="1" max="24" value="8" data-zh="時間範圍（小時）" data-en="Time Range (Hours)">
+            </div>
+            <div>
+                <label for="start-date" data-zh="開始日期:" data-en="Start Date:">開始日期:</label>
+                <input type="date" id="start-date" name="start-date" required data-zh="開始日期" data-en="Start Date">
+                
+                <label for="start-time-hour" data-zh="開始時間:" data-en="Start Time:">開始時間:</label>
+                <input type="number" id="start-time-hour" name="start-time-hour" min="0" max="23" value="0" data-zh="小時" data-en="Hour">
+                <input type="number" id="start-time-minute" name="start-time-minute" min="0" max="59" value="0" data-zh="分鐘" data-en="Minute">
+                
+                <button type="button" id="set-now-btn" data-zh="設為現在" data-en="Set to Now">設為現在</button>
+            </div>
         </div>
 
         <div class="form-group">
@@ -608,20 +631,6 @@
         </div>
 
         <div class="form-group flex-row">
-            <label for="image-format" data-zh="圖片格式：" data-en="Image Format:">圖片格式：</label>
-            <select id="image-format" name="image-format">
-                <option value="png" data-zh="PNG" data-en="PNG">PNG</option>
-                <option value="jpeg" data-zh="JPEG" data-en="JPEG">JPEG</option>
-                <option value="svg" data-zh="SVG" data-en="SVG">SVG</option>
-            </select>
-
-            <label for="image-quality" data-zh="圖片品質：" data-en="Image Quality:">圖片品質：</label>
-            <select id="image-quality" name="image-quality">
-                <option value="low" data-zh="低" data-en="Low">低</option>
-                <option value="medium" data-zh="中" data-en="Medium" selected>中</option>
-                <option value="high" data-zh="高" data-en="High">高</option>
-            </select>
-
             <button id="generate-btn" onclick="generateChart()" data-zh="生成圖表" data-en="Generate Chart">生成圖表</button>
         </div>
 
@@ -832,7 +841,7 @@
 
     function translateCategory(category) {
         const translations = {
-            '行星': 'Planets',
+            '太陽系': 'Solar System',
             '春季': 'Spring',
             '夏季': 'Summer',
             '秋季': 'Autumn',
@@ -888,7 +897,10 @@
 
         const selectedBodies = Array.from(selectedBodiesSet);
         const hours = parseFloat(document.getElementById('hours').value);
-        const startTime = document.getElementById('start-time').value;
+        const startDate = document.getElementById('start-date').value;
+        const startHour = document.getElementById('start-time-hour').value;
+        const startMinute = document.getElementById('start-time-minute').value;
+        const startTime = `${startDate}T${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
         const longitude = parseFloat(document.getElementById('longitude').value);
         const latitude = parseFloat(document.getElementById('latitude').value);
         const imageFormat = document.getElementById('image-format').value;
@@ -916,8 +928,8 @@
             const astro = Astronomy;
             const observer = new astro.Observer(latitude, longitude, 0);
 
-            const startDate = new Date(startTime);
-            if (isNaN(startDate)) {
+            const startDateObj = new Date(startTime);
+            if (isNaN(startDateObj)) {
                 loadingEl.style.display = 'none';
                 showError(currentLanguage === 'zh' ? '請輸入有效的開始時間' : 'Please enter a valid start time');
                 return;
@@ -926,10 +938,10 @@
             const deltaHours = hours;
             const timeArray = [];
             const totalMilliseconds = deltaHours * 60 * 60 * 1000;
-            const step = totalMilliseconds / 100; // 每1%時間範圍的間隔
+            const step = totalMilliseconds / 100;  
 
             for (let i = 0; i <= 100; i++) {
-                let dt = new Date(startDate.getTime() + (i * step));
+                let dt = new Date(startDateObj.getTime() + (i * step));
                 timeArray.push(dt);
             }
 
@@ -973,7 +985,7 @@
                     y: altitudes,
                     mode: 'lines',
                     name: getPlanetName(bodyName),
-                    line: { shape: 'spline' } // 添加平滑曲線
+                    line: { shape: 'spline' } 
                 });
             }
 
@@ -1101,13 +1113,18 @@
     }
 
     function downloadImage() {
-        const img = document.querySelector('#result img');
-        if (img) {
-            const link = document.createElement('a');
-            link.href = img.src;
-            link.download = 'chart.' + img.src.split('.').pop().split('?')[0];
-            link.click();
-        }
+        const imageFormat = document.getElementById('image-format').value; 
+        Plotly.toImage('result', {format: imageFormat, height: 600, width: 800})
+            .then(function(dataUrl) {
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = `chart.${imageFormat}`;
+                link.click();
+            })
+            .catch(function(error) {
+                console.error('下載圖片時出錯:', error);
+                showError(currentLanguage === 'zh' ? '下載圖片時出錯' : 'Error downloading image');
+            });
     }
 
     function openTutorial() {
@@ -1141,7 +1158,6 @@
         renderPagination();
         updateSelectedBodiesList();
         updateTutorialSteps();
-        openTutorial(); 
     }
 
     function applyColorScheme() {
@@ -1160,7 +1176,6 @@
         updateDarkModeButtonText();
     }
 
-    // 新增保存字體大小的函數
     function saveFontSize() {
         const fontSize = document.getElementById('font-size').value;
         if (fontSize === 'small') {
@@ -1173,7 +1188,6 @@
         localStorage.setItem('fontSize', fontSize);
     }
 
-    // 新增保存語言的函數
     function saveLanguage() {
         const language = document.getElementById('language-select').value;
         localStorage.setItem('language', language);
@@ -1181,7 +1195,6 @@
         applyLanguage();
     }
 
-    // 更新事件監聽器，分離字體大小和語言的保存
     document.getElementById('font-size').removeEventListener('change', saveSettings);
     document.getElementById('font-size').addEventListener('change', saveFontSize);
 
@@ -1247,6 +1260,24 @@
         document.getElementById('settingsModal').classList.remove('active');
     }
 
+    function setStartTimeToNow() {
+        const startDateInput = document.getElementById('start-date');
+        const startHourInput = document.getElementById('start-time-hour');
+        const startMinuteInput = document.getElementById('start-time-minute');
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const localDate = `${year}-${month}-${day}`;
+        startDateInput.value = localDate;
+        startHourInput.value = hours;
+        startMinuteInput.value = minutes;
+    }
+
+    document.getElementById('set-now-btn').addEventListener('click', setStartTimeToNow);
+
     window.onload = async function() {
         const languageModal = document.getElementById('languageModal');
         languageModal.classList.add('active');
@@ -1259,15 +1290,8 @@
         updateTutorialSteps();
         updateButtons();
 
-        const startTimeInput = document.getElementById('start-time');
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-        startTimeInput.value = localDateTime;
+        const setNowBtn = document.getElementById('set-now-btn');
+        setNowBtn.addEventListener('click', setStartTimeToNow);
 
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             if (e.matches) {
@@ -1324,6 +1348,7 @@
         languageSelect.addEventListener('change', saveLanguage);
 
         loadSettings();
+        setStartTimeToNow(); 
     };
 
     let currentStep = 1;

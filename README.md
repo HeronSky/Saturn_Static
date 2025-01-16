@@ -43,7 +43,8 @@ Toggle the **Dark Mode** button to switch between light and dark themes for bett
 
 ### 8. Settings
 Click **"Settings"** to adjust font sizes and other preferences.
-
+---
+This project includes AI-assisted editing.
 ---
 
 # SkyVault: 靜態部署的行星高度變化圖表  
@@ -91,3 +92,5 @@ Click **"Settings"** to adjust font sizes and other preferences.
 
 ### 8. 設置
 點擊 **「設置」** 以調整字體大小和其他偏好設置。
+---
+本專案使用 AI 輔助編輯。
