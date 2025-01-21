@@ -32,7 +32,7 @@
             position: relative;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             text-align: center;
         }
         select {
@@ -57,14 +57,16 @@
             background-color: var(--button-background);
             color: var(--text-color);
             border: 2px solid var(--button-border);
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             margin: 10px 5px;
-            transition: background-color 1s ease, color 1s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
         button:hover, #generate-btn:hover, #download-btn:hover, #location-btn:hover {
             background-color: var(--button-hover-bg);
             color: var(--button-hover-text);
+            transform: translateY(-2px);
         }
         #loading, #error {
             display: none;
@@ -81,7 +83,7 @@
         .checkbox-group {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 5px;
             justify-content: center;
         }
         .checkbox-group label {
@@ -91,10 +93,19 @@
         }
         .button-group {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
+
+        @media (min-width: 600px) {
+            .button-group {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+        }
+
         .right-controls {
             display: flex;
             align-items: center;
@@ -209,6 +220,10 @@
             color: #ffffff;
         }
         .selected-bodies-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             margin-top: 20px;
             text-align: center;
         }
@@ -236,10 +251,11 @@
             align-items: center;
             font-size: 12px;
             cursor: pointer;
-            transition: background-color 1s ease, color 1s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
         .body-item:hover {
             background-color: #c0c0c0;
+            transform: scale(1.05);
         }
         body.dark-mode .selected-bodies {
             background-color: transparent;
@@ -274,7 +290,7 @@
         .modal {
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -290,21 +306,26 @@
         .modal.active {
             opacity: 1;
             visibility: visible;
+            transform: scale(1);
         }
         .modal-content {
             background-color: var(--modal-bg);
-            width: 70%;
-            max-width: 600px;
+            width: 90%;
+            max-width: 500px;
             border-radius: 8px;
             position: relative;
             padding: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             color: var(--modal-text);
-            transition: background-color 1s ease, color 1s ease;
+            transition: background-color 0.5s ease, transform 0.5s ease;
+            transform: translateY(-20px);
         }
         body.dark-mode .modal-content {
             background-color: #2e2e2e;
             color: #ffffff;
+        }
+        .modal.active .modal-content {
+            transform: translateY(0);
         }
         .close-btn {
             color: var(--close-btn-color);
@@ -365,7 +386,7 @@
 
         @media (max-width: 600px) {
             body {
-                padding: 10px;
+                padding: 15px;
             }
             .form-group {
                 margin-bottom: 15px;
@@ -384,6 +405,9 @@
             .modal-content {
                 width: 90%;
                 padding: 20px;
+            }
+            .button-group {
+                gap: 10px;
             }
         }
 
@@ -482,8 +506,70 @@
         .center-buttons {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             margin: 10px 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .selected-bodies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+                padding: 15px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .center-buttons {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            button, #generate-btn, #download-btn, #location-btn, input, select {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .checkbox-group {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .modal-content, .language-modal-content, .settings-modal-content, .about-modal-content {
+                width: 90%;
+                padding: 20px;
+            }
+
+            .selected-bodies-container {
+                gap: 8px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
         }
     </style>
     <meta property="og:title" content="SkyVault" data-zh="SkyVault" data-en="SkyVault">
@@ -507,7 +593,7 @@
         </div>
         <div class="center-buttons">
             <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">如何使用</button>
-            <button id="github-project-btn" onclick="window.open('https://github.com/HeronSky/Saturn_Static', '_blank')" data-zh="GitHub 專案" data-en="GitHub Project">GitHub Project</button>
+            <button id="about-btn" onclick="openAbout()" data-zh="關於" data-en="About">關於</button>
             <button id="settings-btn" data-zh="設定" data-en="Settings">設定</button>
         </div>
         <div class="right-controls">
@@ -609,12 +695,8 @@
                 <input type="number" id="hours" name="hours" min="1" max="24" value="8" data-zh="時間範圍（小時）" data-en="Time Range (Hours)">
             </div>
             <div>
-                <label for="start-date" data-zh="開始日期:" data-en="Start Date:">開始日期:</label>
-                <input type="date" id="start-date" name="start-date" required data-zh="開始日期" data-en="Start Date">
-                
-                <label for="start-time-hour" data-zh="開始時間:" data-en="Start Time:">開始時間:</label>
-                <input type="number" id="start-time-hour" name="start-time-hour" min="0" max="23" value="0" data-zh="小時" data-en="Hour">
-                <input type="number" id="start-time-minute" name="start-time-minute" min="0" max="59" value="0" data-zh="分鐘" data-en="Minute">
+                <label for="start-datetime" data-zh="開始日期時間:" data-en="Start Date and Time:">開始日期時間:</label>
+                <input type="datetime-local" id="start-datetime" name="start-datetime" required data-zh="開始日期時間" data-en="Start Date and Time">
                 
                 <button type="button" id="set-now-btn" data-zh="設為現在" data-en="Set to Now">設為現在</button>
             </div>
@@ -643,6 +725,17 @@
     <div class="contact-info">
         <h2>Contact Information</h2>
         <p>Email: <a href="mailto:admin@starview.space">admin@starview.space</a></p>
+    </div>
+
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAbout()">&times;</span>
+            <h2 data-zh="關於" data-en="About">關於</h2>
+            <p data-zh="本網站提供天體高度變化的圖表功能。只需輸入觀測地點和時間，即可生成天體高度曲線，能作為天文觀測規劃的參考。" data-en="This website provides chart functionalities for celestial altitude variations. Simply enter the observation location and time to generate precise celestial altitude curves, assisting you in planning astronomical observations.">
+                本網站提供天體高度變化的圖表功能。只需輸入觀測地點和時間，即可生成精確的天體高度曲線，幫助您規劃天文觀測。
+            </p>
+            <h3><a href="https://github.com/HeronSky/Saturn_Static" target="_blank" data-zh="GitHub 專案" data-en="GitHub Project">GitHub Project</a></h3>
+        </div>
     </div>
 
     <script>
@@ -896,15 +989,10 @@
         downloadBtn.style.display = 'none';
 
         const selectedBodies = Array.from(selectedBodiesSet);
-        const hours = parseFloat(document.getElementById('hours').value);
-        const startDate = document.getElementById('start-date').value;
-        const startHour = document.getElementById('start-time-hour').value;
-        const startMinute = document.getElementById('start-time-minute').value;
-        const startTime = `${startDate}T${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+        const hours = 0;
+        const minutes = 0;
         const longitude = parseFloat(document.getElementById('longitude').value);
         const latitude = parseFloat(document.getElementById('latitude').value);
-        const imageFormat = document.getElementById('image-format').value;
-        const imageQualitySelection = document.getElementById('image-quality').value;
 
         if (selectedBodies.length === 0) {
             loadingEl.style.display = 'none';
@@ -928,73 +1016,52 @@
             const astro = Astronomy;
             const observer = new astro.Observer(latitude, longitude, 0);
 
-            const startDateObj = new Date(startTime);
+            const currentDate = new Date();
+            currentDate.setHours(currentDate.getHours() + hours);
+            currentDate.setMinutes(currentDate.getMinutes() + minutes);
+            const startDateTimeISO = currentDate.toISOString();
+
+            const startDateObj = new Date(startDateTimeISO);
             if (isNaN(startDateObj)) {
                 loadingEl.style.display = 'none';
-                showError(currentLanguage === 'zh' ? '請輸入有效的開始時間' : 'Please enter a valid start time');
+                showError(currentLanguage === 'zh' ? '請輸入有效的開始日期時間' : 'Please enter a valid start datetime');
                 return;
             }
 
-            const deltaHours = hours;
+            const deltaHours = 24; 
             const timeArray = [];
             const totalMilliseconds = deltaHours * 60 * 60 * 1000;
             const step = totalMilliseconds / 100;  
 
             for (let i = 0; i <= 100; i++) {
-                let dt = new Date(startDateObj.getTime() + (i * step));
-                timeArray.push(dt);
+                const currentTime = new Date(startDateObj.getTime() + i * step);
+                timeArray.push(currentTime);
             }
 
             const traces = [];
 
             for (let bodyName of selectedBodies) {
-                const bodyData = allBodies.find(b => b.value === bodyName);
-                if (!bodyData) {
-                    showError(currentLanguage === 'zh' ? `無法找到天體：${bodyName}` : `Unable to find celestial body: ${bodyName}`);
-                    return;
-                }
+                const altitudes = timeArray.map(time => {
+                    const body = astro.GetBody(bodyName, time);
+                    const position = astro.GetEquatorial(body, time, observer);
+                    return astro.RadToDeg(astro.Altitude(position, observer, time));
+                });
 
-                const altitudes = [];
-                const times = [];
-                for (let dt of timeArray) {
-                    let jd = astro.MakeTime(dt);
-                    let horizontal;
-                    if (astro.Body[bodyName]) {
-                        const equCoords = astro.Equator(bodyName, jd, observer, true, true);
-                        horizontal = astro.Horizon(jd, observer, equCoords.ra, equCoords.dec, 'normal');
-                    } else if (bodyData.rightAscension !== undefined && bodyData.declination !== undefined) {
-                        const ra = bodyData.rightAscension;
-                        const dec = bodyData.declination;
-                        horizontal = astro.Horizon(jd, observer, ra, dec, 'normal');
-                    } else {
-                        showError(currentLanguage === 'zh' ? `天體資料不完整：${bodyName}` : `Incomplete data for celestial body: ${bodyName}`);
-                        return;
-                    }
-
-                    if (horizontal) {
-                        altitudes.push(horizontal.altitude);
-                        times.push(dt);
-                    } else {
-                        altitudes.push(null);
-                        times.push(dt);
-                    }
-                }
+                const dates = timeArray.map(time => time.toISOString());
 
                 traces.push({
-                    x: times,
+                    x: dates,
                     y: altitudes,
                     mode: 'lines',
-                    name: getPlanetName(bodyName),
-                    line: { shape: 'spline' } 
+                    name: getPlanetName(bodyName)
                 });
             }
 
             const layout = {
-                showlegend: true,
+                title: currentLanguage === 'zh' ? '天體高度變化圖表' : 'Celestial Altitude Variation Chart',
                 xaxis: {
-                    title: currentLanguage === 'zh' ? '當地時間' : 'Local Time',
-                    tickformat: '%H:%M',
-                    nticks: Math.min(12, deltaHours + 1)
+                    title: currentLanguage === 'zh' ? '時間' : 'Time',
+                    type: 'date'
                 },
                 yaxis: {
                     title: currentLanguage === 'zh' ? '高度 (度)' : 'Altitude (degrees)'
@@ -1002,51 +1069,9 @@
             };
 
             Plotly.newPlot(resultEl, traces, layout).then(function(gd) {
-                let imageQuality;
-                switch(imageQualitySelection) {
-                    case 'low':
-                        imageQuality = 0.5;
-                        break;
-                    case 'medium':
-                        imageQuality = 0.75;
-                        break;
-                    case 'high':
-                        imageQuality = 1;
-                        break;
-                    default:
-                        imageQuality = 1;
-                }
-
-                let toImageOptions = {
-                    format: imageFormat,
-                    width: 1280,
-                    height: 720,
-                    scale: imageQuality
-                };
-
-                Plotly.toImage(gd, toImageOptions).then(function(dataUrl) {
-                    Plotly.purge(resultEl);
-                    const img = new Image();
-                    img.src = dataUrl;
-                    img.alt = currentLanguage === 'zh' ? '天體高度變化圖表' : 'Celestial Bodies Altitude Chart';
-                    img.style.maxWidth = '100%';
-                    resultEl.appendChild(img);
-
-                    loadingEl.style.display = 'none';
-                    downloadBtn.style.display = 'block';
-                    downloadBtn.onclick = function() {
-                        const link = document.createElement('a');
-                        link.href = img.src;
-                        link.download = 'chart.' + imageFormat;
-                        link.click();
-                    };
-                }).catch(function(error) {
-                    console.error('生成圖像時出錯:', error);
-                    loadingEl.style.display = 'none';
-                    showError(currentLanguage === 'zh' ? '生成圖像時出錯' : 'Error generating image');
-                });
+                loadingEl.style.display = 'none';
+                downloadBtn.style.display = 'inline-block';
             }).catch(function(error) {
-                console.error('生成圖表時出錯:', error);
                 loadingEl.style.display = 'none';
                 showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
             });
@@ -1260,23 +1285,19 @@
         document.getElementById('settingsModal').classList.remove('active');
     }
 
-    function setStartTimeToNow() {
-        const startDateInput = document.getElementById('start-date');
-        const startHourInput = document.getElementById('start-time-hour');
-        const startMinuteInput = document.getElementById('start-time-minute');
+    function setStartDateTimeToNow() {
+        const startDateTimeInput = document.getElementById('start-datetime');
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
-        const localDate = `${year}-${month}-${day}`;
-        startDateInput.value = localDate;
-        startHourInput.value = hours;
-        startMinuteInput.value = minutes;
+        const localDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+        startDateTimeInput.value = localDatetime;
     }
 
-    document.getElementById('set-now-btn').addEventListener('click', setStartTimeToNow);
+    document.getElementById('set-now-btn').addEventListener('click', setStartDateTimeToNow);
 
     window.onload = async function() {
         const languageModal = document.getElementById('languageModal');
@@ -1291,7 +1312,7 @@
         updateButtons();
 
         const setNowBtn = document.getElementById('set-now-btn');
-        setNowBtn.addEventListener('click', setStartTimeToNow);
+        setNowBtn.addEventListener('click', setStartDateTimeToNow);
 
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             if (e.matches) {
@@ -1348,7 +1369,7 @@
         languageSelect.addEventListener('change', saveLanguage);
 
         loadSettings();
-        setStartTimeToNow(); 
+        setStartDateTimeToNow(); 
     };
 
     let currentStep = 1;
@@ -1410,6 +1431,14 @@
 
         const prevBtn = document.getElementById('prevStep');
         prevBtn.disabled = currentStep === 1;
+    }
+
+    function openAbout() {
+        document.getElementById('aboutModal').classList.add('active');
+    }
+
+    function closeAbout() {
+        document.getElementById('aboutModal').classList.remove('active');
     }
 </script>
 </body>
