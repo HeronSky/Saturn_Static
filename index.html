@@ -6,22 +6,26 @@
     <title data-zh="SkyVault" data-en="SkyVault">SkyVault</title>
     <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min"></script>
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #007bff;
-            --background-color: white;
-            --text-color: black;
-            --button-hover-bg: #007bff;
-            --button-hover-text: #ffffff;
+            --background-color: #000814;
+            --text-color: #d3d3d3;
+            --button-hover-bg: #4ea8de;
+            --button-hover-text: #121212;
             --button-background: transparent;
-            --button-border: #007bff;
-            --modal-bg: #fefefe;
-            --modal-text: #333;
-            --close-btn-color: #aaaaaa;
-            --close-btn-hover: #000000;
+            --button-border: #ffffff;
+            --modal-bg: #2e2e2e;
+            --modal-text: #ffffff;
+            --close-btn-color: #ffffff;
+            --close-btn-hover: #ffffff;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif, 'Microsoft JhengHei', '微軟正黑體';
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
@@ -30,9 +34,18 @@
             color: var(--text-color);
             transition: background-color 1s ease, color 1s ease;
             position: relative;
+            background-image: url('path/to/starry-sky.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        body.en {
+            font-family: 'Poppins', sans-serif;
         }
         .form-group {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             text-align: center;
         }
         select {
@@ -44,7 +57,7 @@
             border: 2px solid var(--button-border);
             border-radius: 8px;
             padding: 8px 16px;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             margin: 10px 5px;
             transition: background-color 1s ease, color 1s ease;
@@ -53,20 +66,18 @@
         }
         button, #generate-btn, #download-btn, #location-btn, input {
             padding: 8px 16px;
-            font-size: 14px;
+            font-size: 16px;
             background-color: var(--button-background);
             color: var(--text-color);
             border: 2px solid var(--button-border);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
             cursor: pointer;
             margin: 10px 5px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            transition: background-color 1s ease, color 1s ease;
         }
         button:hover, #generate-btn:hover, #download-btn:hover, #location-btn:hover {
             background-color: var(--button-hover-bg);
             color: var(--button-hover-text);
-            transform: translateY(-2px);
         }
         #loading, #error {
             display: none;
@@ -83,7 +94,7 @@
         .checkbox-group {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
+            gap: 10px;
             justify-content: center;
         }
         .checkbox-group label {
@@ -93,19 +104,10 @@
         }
         .button-group {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
-
-        @media (min-width: 600px) {
-            .button-group {
-                flex-direction: row;
-                justify-content: space-between;
-                width: 100%;
-            }
-        }
-
         .right-controls {
             display: flex;
             align-items: center;
@@ -128,41 +130,6 @@
         #toggle-dark-mode:hover {
             background-color: var(--button-hover-bg);
             color: var(--button-hover-text);
-        }
-        body.dark-mode {
-            --background-color: #1e1e1e;
-            --text-color: #ffffff;
-            --button-hover-bg: #4ea8de;
-            --button-hover-text: #121212;
-            --button-border: #ffffff;
-            --modal-bg: #2e2e2e;
-            --modal-text: #ffffff;
-            --close-btn-color: #ffffff;
-            --close-btn-hover: #ffffff;
-        }
-        body.dark-mode #toggle-dark-mode {
-            color: var(--text-color);
-            border: 2px solid var(--button-border);
-        }
-        body.dark-mode #toggle-dark-mode:hover {
-            background-color: #ffffff;
-            color: #000000;
-        }
-        body.dark-mode button, 
-        body.dark-mode #generate-btn, 
-        body.dark-mode #download-btn, 
-        body.dark-mode #location-btn {
-            color: var(--text-color);
-            border: 2px solid var(--button-border);
-        }
-        body.dark-mode .pagination button {
-            border: 1px solid #4ea8de;
-            color: #4ea8de;
-        }
-        body.dark-mode .pagination button.active,
-        body.dark-mode .pagination button:hover {
-            background-color: #4ea8de;
-            color: #121212;
         }
         .github-link {
             margin-bottom: 20px;
@@ -220,10 +187,6 @@
             color: #ffffff;
         }
         .selected-bodies-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
             margin-top: 20px;
             text-align: center;
         }
@@ -251,11 +214,10 @@
             align-items: center;
             font-size: 12px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            transition: background-color 1s ease, color 1s ease;
         }
         .body-item:hover {
             background-color: #c0c0c0;
-            transform: scale(1.05);
         }
         body.dark-mode .selected-bodies {
             background-color: transparent;
@@ -290,7 +252,7 @@
         .modal {
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -306,26 +268,22 @@
         .modal.active {
             opacity: 1;
             visibility: visible;
-            transform: scale(1);
         }
         .modal-content {
             background-color: var(--modal-bg);
-            width: 90%;
-            max-width: 500px;
+            width: 70%;
+            max-width: 600px;
             border-radius: 8px;
             position: relative;
             padding: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             color: var(--modal-text);
-            transition: background-color 0.5s ease, transform 0.5s ease;
-            transform: translateY(-20px);
+            transition: background-color 1s ease, color 1s ease;
+            font-size: 16px;
         }
         body.dark-mode .modal-content {
             background-color: #2e2e2e;
             color: #ffffff;
-        }
-        .modal.active .modal-content {
-            transform: translateY(0);
         }
         .close-btn {
             color: var(--close-btn-color);
@@ -386,7 +344,7 @@
 
         @media (max-width: 600px) {
             body {
-                padding: 15px;
+                padding: 10px;
             }
             .form-group {
                 margin-bottom: 15px;
@@ -405,9 +363,6 @@
             .modal-content {
                 width: 90%;
                 padding: 20px;
-            }
-            .button-group {
-                gap: 10px;
             }
         }
 
@@ -439,6 +394,7 @@
             text-align: center;
             color: var(--modal-text);
             transition: background-color 1s ease, color 1s ease;
+            font-size: 16px;
         }
         .language-modal-content button {
             padding: 10px 20px;
@@ -485,6 +441,7 @@
             text-align: center;
             color: var(--modal-text);
             transition: background-color 1s ease, color 1s ease;
+            font-size: 16px;
         }
 
         .settings-modal-content button {
@@ -506,69 +463,116 @@
         .center-buttons {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin: 10px 0;
+            gap: 10px;
         }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
+        .about-modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            position: fixed;
+            z-index: 1003;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0,0,0,0.7);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .about-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .about-modal-content {
+            background-color: var(--modal-bg);
+            width: 80%;
+            max-width: 600px;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            text-align: center;
         }
 
-        .checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            justify-content: center;
+        .about-modal-content h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
         }
 
-        .selected-bodies {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            justify-content: center;
+        .about-modal-content p {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            line-height: 1.6;
         }
 
-        @media (max-width: 600px) {
-            body {
-                font-size: 16px;
-                padding: 15px;
-            }
+        .github-btn {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-weight: bold;
+            display: inline-block;
+        }
 
-            .button-group {
-                flex-direction: column;
-                gap: 10px;
-            }
+        .github-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
 
-            .center-buttons {
-                flex-direction: column;
-                gap: 10px;
-                width: 100%;
-            }
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999; 
+            overflow: hidden;
+        }
 
-            button, #generate-btn, #download-btn, #location-btn, input, select {
-                width: 100%;
-                margin: 5px 0;
-            }
+        .star {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            border-radius: 50%;
+            opacity: 0.8;
+            background-color: #ffffff;
+        }
 
-            .checkbox-group {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
+        h1, h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2em;
+            line-height: 1.2;
+        }
 
-            .modal-content, .language-modal-content, .settings-modal-content, .about-modal-content {
-                width: 90%;
-                padding: 20px;
-            }
+        h2 {
+            font-size: 1.5em;
+        }
 
-            .selected-bodies-container {
-                gap: 8px;
-            }
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to top, rgba(255,255,255,0), white); 
+            border-radius: 50%;
+            opacity: 1; 
+            animation: shoot 3s linear forwards; 
+            transform: translateX(0) translateY(0) rotate(45deg); 
+            z-index: 998; 
+        }
 
-            .form-group {
-                margin-bottom: 15px;
+        @keyframes shoot {
+            0% {
+                transform: translateX(0) translateY(0) rotate(45deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-300px) translateY(300px) rotate(45deg);
+                opacity: 0;
             }
         }
     </style>
@@ -588,12 +592,9 @@
     </div>
 
     <div class="button-group">
-        <div>
-            <button id="toggle-dark-mode">切換深色模式</button>
-        </div>
         <div class="center-buttons">
             <button id="open-tutorial-btn" onclick="openTutorial()" data-zh="如何使用" data-en="How to Use">如何使用</button>
-            <button id="about-btn" onclick="openAbout()" data-zh="關於" data-en="About">關於</button>
+            <button id="about-btn" data-zh="關於" data-en="About">關於</button>
             <button id="settings-btn" data-zh="設定" data-en="Settings">設定</button>
         </div>
         <div class="right-controls">
@@ -627,20 +628,12 @@
                     <option value="svg" data-zh="SVG" data-en="SVG">SVG</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="image-quality" data-zh="圖片品質：" data-en="Image Quality:">圖片品質：</label>
-                <select id="image-quality" name="image-quality">
-                    <option value="low" data-zh="低" data-en="Low">低</option>
-                    <option value="medium" data-zh="中" data-en="Medium" selected>中</option>
-                    <option value="high" data-zh="高" data-en="High">高</option>
-                </select>
-            </div>
             <button id="confirm-settings-btn" data-zh="確定" data-en="Confirm">確定</button>
         </div>
     </div>
 
     <div class="container">
-        <h1 data-zh="SkyVault天體變化圖表" data-en="SkyVault Celestial Variation Chart">SkyVault天體變化圖表</h1>
+        <h1 data-zh="SkyVault 天體變化圖表" data-en="SkyVault Celestial Variation Chart">SkyVault 天體變化圖表</h1>
         <div class="modal" id="tutorialModal">
             <div class="modal-content" id="tutorialContent">
                 <span class="close-btn" onclick="closeTutorial()">&times;</span>
@@ -695,9 +688,14 @@
                 <input type="number" id="hours" name="hours" min="1" max="24" value="8" data-zh="時間範圍（小時）" data-en="Time Range (Hours)">
             </div>
             <div>
-                <label for="start-datetime" data-zh="開始日期時間:" data-en="Start Date and Time:">開始日期時間:</label>
-                <input type="datetime-local" id="start-datetime" name="start-datetime" required data-zh="開始日期時間" data-en="Start Date and Time">
-                
+        <div class="form-group flex-row">
+            <div>
+                <label for="hours" data-zh="時間範圍（小時）:" data-en="Time Range (Hours):">時間範圍（小時）:</label>
+                <input type="number" id="hours" name="hours" min="1" max="24" value="8" data-zh="時間範圍（小時）" data-en="Time Range (Hours)">
+            </div>
+            <div>
+                <label for="start-datetime" data-zh="開始時間:" data-en="Start Time:">開始時間:</label>
+                <input type="datetime-local" id="start-datetime" name="start-datetime" required data-zh="開始時間" data-en="Start Time">
                 <button type="button" id="set-now-btn" data-zh="設為現在" data-en="Set to Now">設為現在</button>
             </div>
         </div>
@@ -727,16 +725,20 @@
         <p>Email: <a href="mailto:admin@starview.space">admin@starview.space</a></p>
     </div>
 
-    <div class="modal" id="aboutModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeAbout()">&times;</span>
-            <h2 data-zh="關於" data-en="About">關於</h2>
-            <p data-zh="本網站提供天體高度變化的圖表功能。只需輸入觀測地點和時間，即可生成天體高度曲線，能作為天文觀測規劃的參考。" data-en="This website provides chart functionalities for celestial altitude variations. Simply enter the observation location and time to generate precise celestial altitude curves, assisting you in planning astronomical observations.">
-                本網站提供天體高度變化的圖表功能。只需輸入觀測地點和時間，即可生成精確的天體高度曲線，幫助您規劃天文觀測。
-            </p>
-            <h3><a href="https://github.com/HeronSky/Saturn_Static" target="_blank" data-zh="GitHub 專案" data-en="GitHub Project">GitHub Project</a></h3>
-        </div>
+    <!-- 新增星點容器 -->
+    <div id="stars"></div>
+
+    <!-- 新增 About 模態視窗 -->
+<div class="modal" id="aboutModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAbout()">&times;</span>
+        <h2 data-zh="關於" data-en="About">關於</h2>
+        <p data-zh="本網站提供天體高度變化的圖表功能。只需輸入觀測地點和時間，即可生成天體高度曲線，能作為天文觀測規劃的參考。" data-en="This website provides chart functionalities for celestial altitude variations. Simply enter the observation location and time to generate precise celestial altitude curves, assisting you in planning astronomical observations.">
+            本網站提供天體高度變化的圖表功能。只需輸入觀測地點和時間，<br>即可生成精確的天體高度曲線，幫助您規劃天文觀測。
+        </p>
+        <h3><a href="https://github.com/HeronSky/Saturn_Static" target="_blank" class="github-btn" data-zh="GitHub 專案" data-en="GitHub Project">GitHub Project</a></h3>
     </div>
+</div>
 
     <script>
     let currentLanguage = 'en';  
@@ -901,6 +903,7 @@
                 currentPage--;
                 renderCheckboxes();
                 renderPagination();
+                updateSelectedBodiesList();
             }
         };
         pagination.appendChild(prevButton);
@@ -920,13 +923,14 @@
         }
 
         const nextButton = document.createElement('button');
-        nextButton.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';
-        nextButton.disabled = currentPage === totalPages;
+        nextButton.textContent = currentLanguage === 'zh' ? '下一頁' : 'Next';  
+        nextButton.disabled = currentPage === totalPages; 
         nextButton.onclick = () => {
             if (currentPage < totalPages) {
                 currentPage++;
                 renderCheckboxes();
                 renderPagination();
+                updateSelectedBodiesList();
             }
         };
         pagination.appendChild(nextButton);
@@ -989,10 +993,11 @@
         downloadBtn.style.display = 'none';
 
         const selectedBodies = Array.from(selectedBodiesSet);
-        const hours = 0;
-        const minutes = 0;
+        const hours = parseFloat(document.getElementById('hours').value);
+        const startDateTime = document.getElementById('start-datetime').value;
         const longitude = parseFloat(document.getElementById('longitude').value);
         const latitude = parseFloat(document.getElementById('latitude').value);
+        const imageFormat = document.getElementById('image-format').value;
 
         if (selectedBodies.length === 0) {
             loadingEl.style.display = 'none';
@@ -1016,52 +1021,73 @@
             const astro = Astronomy;
             const observer = new astro.Observer(latitude, longitude, 0);
 
-            const currentDate = new Date();
-            currentDate.setHours(currentDate.getHours() + hours);
-            currentDate.setMinutes(currentDate.getMinutes() + minutes);
-            const startDateTimeISO = currentDate.toISOString();
-
-            const startDateObj = new Date(startDateTimeISO);
+            const startDateObj = new Date(startDateTime); 
             if (isNaN(startDateObj)) {
                 loadingEl.style.display = 'none';
-                showError(currentLanguage === 'zh' ? '請輸入有效的開始日期時間' : 'Please enter a valid start datetime');
+                showError(currentLanguage === 'zh' ? '請輸入有效的開始日期和時間' : 'Please enter a valid start date and time');
                 return;
             }
 
-            const deltaHours = 24; 
+            const deltaHours = hours;
             const timeArray = [];
             const totalMilliseconds = deltaHours * 60 * 60 * 1000;
             const step = totalMilliseconds / 100;  
 
             for (let i = 0; i <= 100; i++) {
-                const currentTime = new Date(startDateObj.getTime() + i * step);
+                const currentTime = new Date(startDateObj.getTime() + step * i);
                 timeArray.push(currentTime);
             }
 
             const traces = [];
 
             for (let bodyName of selectedBodies) {
-                const altitudes = timeArray.map(time => {
-                    const body = astro.GetBody(bodyName, time);
-                    const position = astro.GetEquatorial(body, time, observer);
-                    return astro.RadToDeg(astro.Altitude(position, observer, time));
-                });
+                const bodyData = allBodies.find(b => b.value === bodyName);
+                if (!bodyData) {
+                    showError(currentLanguage === 'zh' ? `無法找到天體：${bodyName}` : `Unable to find celestial body: ${bodyName}`);
+                    return;
+                }
 
-                const dates = timeArray.map(time => time.toISOString());
+                const altitudes = [];
+                const times = [];
+                for (let dt of timeArray) {
+                    let jd = astro.MakeTime(dt);
+                    let horizontal;
+                    if (astro.Body[bodyName]) {
+                        const equCoords = astro.Equator(bodyName, jd, observer, true, true);
+                        horizontal = astro.Horizon(jd, observer, equCoords.ra, equCoords.dec, 'normal');
+                    } else if (bodyData.rightAscension !== undefined && bodyData.declination !== undefined) {
+                        const ra = bodyData.rightAscension;
+                        const dec = bodyData.declination;
+                        horizontal = astro.Horizon(jd, observer, ra, dec, 'normal');
+                    } else {
+                        showError(currentLanguage === 'zh' ? `天體資料不完整：${bodyName}` : `Incomplete data for celestial body: ${bodyName}`);
+                        return;
+                    }
+
+                    if (horizontal) {
+                        altitudes.push(horizontal.altitude);
+                        times.push(dt);
+                    } else {
+                        altitudes.push(null);
+                        times.push(dt);
+                    }
+                }
 
                 traces.push({
-                    x: dates,
+                    x: times,
                     y: altitudes,
                     mode: 'lines',
-                    name: getPlanetName(bodyName)
+                    name: getPlanetName(bodyName),
+                    line: { shape: 'spline' } 
                 });
             }
 
             const layout = {
-                title: currentLanguage === 'zh' ? '天體高度變化圖表' : 'Celestial Altitude Variation Chart',
+                showlegend: true,
                 xaxis: {
-                    title: currentLanguage === 'zh' ? '時間' : 'Time',
-                    type: 'date'
+                    title: currentLanguage === 'zh' ? '當地時間' : 'Local Time',
+                    tickformat: '%H:%M',
+                    nticks: Math.min(12, deltaHours + 1)
                 },
                 yaxis: {
                     title: currentLanguage === 'zh' ? '高度 (度)' : 'Altitude (degrees)'
@@ -1069,9 +1095,37 @@
             };
 
             Plotly.newPlot(resultEl, traces, layout).then(function(gd) {
-                loadingEl.style.display = 'none';
-                downloadBtn.style.display = 'inline-block';
+                let imageQuality = 1;
+
+                let toImageOptions = {
+                    format: imageFormat,
+                    width: 1280,
+                    height: 720,
+                    scale: imageQuality
+                };
+
+                Plotly.toImage(gd, toImageOptions).then(function(dataUrl) {
+                    Plotly.purge(resultEl);
+                    const img = new Image();
+                    img.src = dataUrl;
+                    img.alt = currentLanguage === 'zh' ? '天體高度變化圖表' : 'Celestial Bodies Altitude Chart';
+                    img.style.maxWidth = '100%';
+                    resultEl.appendChild(img);
+
+                    loadingEl.style.display = 'none';
+                    downloadBtn.style.display = 'block';
+                    downloadBtn.onclick = function() {
+                        const link = document.createElement('a');
+                        link.href = img.src;
+                        link.download = 'chart.' + imageFormat;
+                        link.click();
+                    };
+                }).catch(function(error) {
+                    loadingEl.style.display = 'none';
+                    showError(currentLanguage === 'zh' ? '生成圖像時出錯' : 'Error generating image');
+                });
             }).catch(function(error) {
+                console.error('生成圖表時出錯:', error);
                 loadingEl.style.display = 'none';
                 showError(currentLanguage === 'zh' ? '生成圖表時出錯' : 'Error generating chart');
             });
@@ -1117,26 +1171,6 @@
         );
     }
 
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        if(document.body.classList.contains('dark-mode')) {
-            localStorage.setItem('theme', 'dark');
-        } else {
-            localStorage.setItem('theme', 'light');
-        }
-        updateDarkModeButtonText();
-        renderCheckboxes();
-        renderPagination();
-        updateSelectedBodiesList();
-    }
-
-    function updateDarkModeButtonText() {
-        const toggleButton = document.getElementById('toggle-dark-mode');
-        toggleButton.textContent = document.body.classList.contains('dark-mode') ? 
-            (currentLanguage === 'zh' ? '淺色模式' : 'Light Mode') : 
-            (currentLanguage === 'zh' ? '深色模式' : 'Dark Mode');
-    }
-
     function downloadImage() {
         const imageFormat = document.getElementById('image-format').value; 
         Plotly.toImage('result', {format: imageFormat, height: 600, width: 800})
@@ -1169,11 +1203,7 @@
         currentLanguage = lang;
         const elements = document.querySelectorAll('[data-zh][data-en]');
         elements.forEach(el => {
-            if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea') {
-                el.placeholder = lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
-            } else {
-                el.textContent = lang === 'zh' ? (el.getAttribute('data-zh') || el.textContent) : (el.getAttribute('data-en') || el.textContent);
-            }
+            el.textContent = el.getAttribute(`data-${currentLanguage}`);
         });
 
         const langModal = document.getElementById('languageModal');
@@ -1183,22 +1213,6 @@
         renderPagination();
         updateSelectedBodiesList();
         updateTutorialSteps();
-    }
-
-    function applyColorScheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if(savedTheme === 'dark'){
-            document.body.classList.add('dark-mode');
-        } else if(savedTheme === 'light'){
-            document.body.classList.remove('dark-mode');
-        } else {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-        }
-        updateDarkModeButtonText();
     }
 
     function saveFontSize() {
@@ -1230,7 +1244,7 @@
         const fontSize = document.getElementById('font-size').value;
         if (fontSize === 'small') {
             document.body.style.fontSize = '14px';
-        } else if (fontSize === 'medium') {
+        } else if ( fontSize === 'medium') {
             document.body.style.fontSize = '16px';
         } else if (fontSize === 'large') {
             document.body.style.fontSize = '18px';
@@ -1269,7 +1283,6 @@
         elements.forEach(el => {
             el.textContent = el.getAttribute(`data-${currentLanguage}`);
         });
-        updateDarkModeButtonText();
     }
 
     document.getElementById('confirm-settings-btn').addEventListener('click', () => {
@@ -1285,26 +1298,19 @@
         document.getElementById('settingsModal').classList.remove('active');
     }
 
-    function setStartDateTimeToNow() {
+    function setStartTimeToNow() {
         const startDateTimeInput = document.getElementById('start-datetime');
         const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const localDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
-        startDateTimeInput.value = localDatetime;
+        const pad = (n) => n.toString().padStart(2, '0');
+        const localDateTime = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        startDateTimeInput.value = localDateTime;
     }
-
-    document.getElementById('set-now-btn').addEventListener('click', setStartDateTimeToNow);
 
     window.onload = async function() {
         const languageModal = document.getElementById('languageModal');
         languageModal.classList.add('active');
 
         await loadBodies();
-        applyColorScheme();
         renderCheckboxes();
         renderPagination();
         updateSelectedBodiesList();
@@ -1312,33 +1318,11 @@
         updateButtons();
 
         const setNowBtn = document.getElementById('set-now-btn');
-        setNowBtn.addEventListener('click', setStartDateTimeToNow);
-
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (e.matches) {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
-            updateDarkModeButtonText();
-            renderCheckboxes();
-            renderPagination();
-            updateSelectedBodiesList();
-        });
-
-        const toggleDarkModeBtn = document.getElementById('toggle-dark-mode');
-        toggleDarkModeBtn.removeAttribute('onclick');
-        toggleDarkModeBtn.addEventListener('click', toggleDarkMode);
+        setNowBtn.addEventListener('click', setStartTimeToNow);
 
         const openTutorialBtn = document.getElementById('open-tutorial-btn');
         openTutorialBtn.removeAttribute('onclick');
         openTutorialBtn.addEventListener('click', openTutorial);
-
-        const githubProjectBtn = document.getElementById('github-project-btn');
-        githubProjectBtn.removeAttribute('onclick');
-        githubProjectBtn.addEventListener('click', function() {
-            window.open('https://github.com/HeronSky/Saturn_Static', '_blank');
-        });
 
         const generateBtn = document.getElementById('generate-btn');
         generateBtn.removeAttribute('onclick');
@@ -1369,7 +1353,8 @@
         languageSelect.addEventListener('change', saveLanguage);
 
         loadSettings();
-        setStartDateTimeToNow(); 
+        setStartTimeToNow(); 
+        createStars();
     };
 
     let currentStep = 1;
@@ -1434,11 +1419,54 @@
     }
 
     function openAbout() {
-        document.getElementById('aboutModal').classList.add('active');
+        const aboutModal = document.getElementById('aboutModal');
+        aboutModal.classList.add('active');
     }
 
     function closeAbout() {
-        document.getElementById('aboutModal').classList.remove('active');
+        const aboutModal = document.getElementById('aboutModal');
+        aboutModal.classList.remove('active');
+    }
+
+    document.getElementById('about-btn').addEventListener('click', openAbout);
+
+    let activeShootingStars = 0;
+    const maxShootingStars = 1; 
+
+    function createStars() {
+        const starsContainer = document.getElementById('stars');
+        const numberOfStars = 100; 
+        const shootingStarFrequency = 0.2;
+    
+        for(let i = 0; i < numberOfStars; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            starsContainer.appendChild(star);
+        }
+    
+        setInterval(() => {
+            if (activeShootingStars < maxShootingStars) {
+                createShootingStar();
+            }
+        }, 1000);
+    }
+
+    function createShootingStar() {
+        const starsContainer = document.getElementById('stars');
+        const shootingStar = document.createElement('div');
+        shootingStar.classList.add('shooting-star');
+        shootingStar.style.left = Math.random() * 100 + '%';
+        shootingStar.style.top = '0%';
+        shootingStar.style.animationDuration = (Math.random() * 1 + 2) + 's'; 
+        shootingStar.style.animationName = 'shoot'; 
+        starsContainer.appendChild(shootingStar);        
+        activeShootingStars++; 
+        shootingStar.addEventListener('animationend', () => {
+            shootingStar.remove();
+            activeShootingStars--; 
+        });
     }
 </script>
 </body>
